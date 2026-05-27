@@ -185,7 +185,6 @@
             border-radius: 8px;
             padding: 12px 16px;
             margin-bottom: 15px;
-            position: relative;
         }
 
         .meta-title {
@@ -387,26 +386,6 @@
             border-color: var(--primary-blue);
         }
 
-        /* Advanced Filter Multi-Grid Controls Styling */
-        .advanced-filters-box {
-            background-color: var(--surface-color);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 15px;
-        }
-        .filter-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        @media(max-width: 480px) {
-            .filter-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         /* Content Lists & Structural Display Layouts */
         .match-card {
             background-color: var(--surface-color);
@@ -414,11 +393,6 @@
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 12px;
-            position: relative;
-        }
-        .match-card.priority-match {
-            border: 2px solid var(--primary-blue);
-            box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
         }
 
         .match-header {
@@ -447,18 +421,9 @@
         .match-status.completed {
             color: var(--accent-green);
         }
-        .match-status.about-to-play {
-            color: #3b82f6;
-            animation: pulse-glow 2s infinite;
-        }
+
         .match-status.pending {
             color: #eab308;
-        }
-        
-        @keyframes pulse-glow {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
         }
 
         .match-body-table {
@@ -495,10 +460,6 @@
 
         .match-team-row.winner .match-team-score {
             color: var(--accent-green);
-        }
-        
-        .match-team-row.tied .match-team-score {
-            color: #eab308;
         }
 
         /* Leaderboard Standing Ladder Display Component */
@@ -631,32 +592,7 @@
         <div id="globalTournamentMetaHeader" class="tournament-meta-display hidden">
             <div id="metaHeaderTitle" class="meta-title">Tournament Name</div>
             <div id="metaHeaderSub" class="meta-subtext">Organized by Creator Name • Date</div>
-            <button id="adminEditTournBtn" class="btn btn-secondary hidden" style="position: absolute; right: 15px; top: 12px; width: auto; padding: 5px 10px; font-size: 0.75rem; margin-bottom: 0;" onclick="app.promptEditTournamentMeta()">⚙️ Edit Info</button>
         </div>
-
-        <main id="view-edit-tournament-meta" class="view-panel hidden">
-            <div class="card">
-                <h2>Modify Tournament Information</h2>
-                <div class="form-group">
-                    <label>Tournament Title</label>
-                    <input type="text" id="edit-tourn-name" class="input-field">
-                </div>
-                <div class="form-group">
-                    <label>Scheduled Event Date</label>
-                    <input type="date" id="edit-tourn-date" class="input-field">
-                </div>
-                <div class="form-group">
-                    <label>Tournament Event Code</label>
-                    <input type="text" id="edit-tourn-code" class="input-field" style="text-transform: uppercase;">
-                </div>
-                <div class="form-group">
-                    <label>Admin Access Code</label>
-                    <input type="text" id="edit-tourn-secret" class="input-field">
-                </div>
-                <button class="btn" style="background-color: var(--accent-green);" onclick="app.executeSaveTournamentMeta()">Save Modifications</button>
-                <button class="btn btn-secondary" onclick="router.cancelEditTournamentMeta()">Cancel</button>
-            </div>
-        </main>
 
         <main id="view-login" class="view-panel">
             <div class="card">
@@ -745,7 +681,7 @@
                 <h2>Your Owned Event Tournaments</h2>
                 <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;">Select a title link to instantly bypass auth gate locks.</p>
                 <div class="admin-tournaments-list" id="ownedTournamentsRoot">
-                </div>
+                    </div>
             </div>
         </main>
 
@@ -759,7 +695,7 @@
                 <p style="font-size: 0.85rem; margin-bottom: 15px;">Input team designations. Tapping Enter or clicking the plus layout box auto-appends sequential rows securely.</p>
                 
                 <div id="dynamic-team-rows-root" class="dynamic-row-container">
-                </div>
+                    </div>
 
                 <button class="btn" style="background-color: var(--primary-blue);" onclick="app.addNewTeamInputRow()">+ Add Team Row</button>
                 <button class="btn" style="background-color: var(--accent-green); margin-top: 10px;" onclick="app.submitTeamRoster()">Save & Commit Roster</button>
@@ -780,50 +716,11 @@
                     <div id="filter-pill-mine" class="filter-pill" onclick="app.setMatchFilter('mine')">My Matches</div>
                 </div>
 
-                <div class="advanced-filters-box">
-                    <div class="filter-grid">
-                        <div>
-                            <label style="font-size:0.75rem; font-weight:bold; color:var(--text-secondary);">Filter Team</label>
-                            <select id="filter-dropdown-team" class="input-field" style="padding:6px; font-size:0.8rem;" onchange="app.triggerFilterUpdate()"></select>
-                        </div>
-                        <div>
-                            <label style="font-size:0.75rem; font-weight:bold; color:var(--text-secondary);">Filter Location/Court</label>
-                            <select id="filter-dropdown-location" class="input-field" style="padding:6px; font-size:0.8rem;" onchange="app.triggerFilterUpdate()"></select>
-                        </div>
-                    </div>
-                    <div class="filter-grid">
-                        <div>
-                            <label style="font-size:0.75rem; font-weight:bold; color:var(--text-secondary);">Filter Status</label>
-                            <select id="filter-dropdown-status" class="input-field" style="padding:6px; font-size:0.8rem;" onchange="app.triggerFilterUpdate()">
-                                <option value="all">All Statuses</option>
-                                <option value="pending">Scheduled</option>
-                                <option value="about-to-play">About to Play</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="font-size:0.75rem; font-weight:bold; color:var(--text-secondary);">Keyword Search Bar</label>
-                            <input type="text" id="filter-search-bar" class="input-field" placeholder="Search match or team..." style="padding:6px; font-size:0.8rem;" oninput="app.triggerFilterUpdate()">
-                        </div>
-                    </div>
-                </div>
-
                 <div id="admin-match-actions-card" class="card hidden" style="border-color: var(--primary-blue); background-color: var(--input-bg);">
                     <h3>Admin Management Dashboard</h3>
                     
                     <div class="admin-action-bar" style="border-top: none; padding-top: 0;">
-                        <label style="font-size: 0.8rem; font-weight: bold; display:block; margin-bottom: 5px;">Create / Update Match Fixture</label>
-                        <div class="form-group" id="edit-mode-indicator-box" style="display:none; background:rgba(16,185,129,0.15); padding:8px; border-radius:6px; border:1px solid var(--accent-green); margin-bottom:10px;">
-                            <span style="font-size:0.8rem; color:var(--accent-green); font-weight:bold;">🛠️ Mode: Modifying Existing Match Record</span>
-                            <button class="btn btn-secondary" style="width:auto; float:right; padding:2px 8px; font-size:0.75rem; margin-bottom:0;" onclick="app.exitMatchEditMode()">Cancel Edit</button>
-                            <div style="clear:both;"></div>
-                        </div>
-
-                        <div class="form-group">
-                            <label style="font-size: 0.75rem; color: var(--text-secondary);">Match Custody Name (Leave blank to generate sequential serials)</label>
-                            <input type="text" id="match-create-name" class="input-field" placeholder="e.g., Quarterfinals Match A" style="padding: 8px; font-size:0.85rem; margin-bottom:8px;">
-                        </div>
-
+                        <label style="font-size: 0.8rem; font-weight: bold; display:block; margin-bottom: 5px;">Create Match Fixture</label>
                         <div class="dynamic-input-row">
                             <div class="row-cell-input" style="width: 35%; padding-right: 5px;">
                                 <select id="match-create-t1" class="input-field" style="padding: 8px; font-size:0.85rem;"></select>
@@ -836,21 +733,11 @@
                                 <input type="text" id="match-create-court" class="input-field" placeholder="Court #" style="padding: 8px; font-size:0.85rem;">
                             </div>
                         </div>
-
-                        <div class="form-group" style="margin-top:5px; margin-bottom:12px;">
-                            <label style="font-size: 0.75rem; color: var(--text-secondary); display:inline-block; margin-right:10px; vertical-align:middle;">Match Track Status:</label>
-                            <select id="match-create-status" class="input-field" style="display:inline-block; width:auto; padding:4px 8px; font-size:0.8rem; vertical-align:middle;">
-                                <option value="pending">Scheduled</option>
-                                <option value="about-to-play">About to Play ⚡ (Prioritize to Top)</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                        </div>
-
-                        <button id="btnSubmitMatchForm" class="btn" style="padding: 8px; font-size: 0.85rem; background-color: var(--primary-blue); margin-bottom: 15px;" onclick="app.executeCreateMatch()">Submit Pair Match</button>
+                        <button class="btn" style="padding: 8px; font-size: 0.85rem; background-color: var(--primary-blue); margin-bottom: 15px;" onclick="app.executeCreateMatch()">Submit Pair Match</button>
                     </div>
 
                     <div class="admin-action-bar">
-                        <label style="font-size: 0.8rem; font-weight: bold; display:block; margin-bottom: 5px;">Record Result Entry / Select Match to Edit</label>
+                        <label style="font-size: 0.8rem; font-weight: bold; display:block; margin-bottom: 5px;">Record Result Entry / Delete Selection</label>
                         <div class="form-group">
                             <select id="admin-score-match-select" class="input-field" style="padding: 8px; font-size: 0.85rem;" onchange="app.syncScoreFieldsWithSelectedMatch()"></select>
                         </div>
@@ -872,20 +759,19 @@
                                 <button class="btn" style="padding: 8px; font-size: 0.85rem; background-color: transparent; border: 1px solid var(--accent-red); color: var(--accent-red); margin-bottom: 0;" onclick="app.executeDeleteSelectedMatch()">🗑️ Delete Match</button>
                             </div>
                         </div>
-                        <button class="btn btn-secondary" style="margin-top:10px; padding:6px; font-size:0.8rem; margin-bottom:0;" onclick="app.loadSelectedMatchToEditor()">✏️ Edit Entire Selected Match Configuration</button>
                     </div>
 
                     <button id="btnModifyRosterRanks" class="btn btn-secondary" style="margin-top: 15px; padding: 6px; font-size: 0.8rem; margin-bottom:0;" onclick="app.checkRosterNavigationEligibility()">Modify Roster Ranks</button>
                 </div>
 
                 <div id="matches-list-root">
-                </div>
+                    </div>
             </div>
 
             <div id="tab-content-scoreboard" class="tab-pane hidden">
                 <div class="card" style="padding: 12px 8px;">
                     <div class="standing-table" id="scoreboard-table-root">
-                    </div>
+                        </div>
                 </div>
             </div>
 
@@ -922,7 +808,6 @@
 
         // Persistent Session Memory Reference Tracking
         let sessionAdminUser = null;
-        let targetedEditMatchId = null; // Holds reference ID when admin is currently updating a fixture
 
         // Realtime Data Sync Pipeline Listener Hook
         onValue(ref(database), (snapshot) => {
@@ -945,109 +830,145 @@
                     if (router.currentTab === 'matches') app.renderMatchesContainer();
                     if (router.currentTab === 'scoreboard') app.renderLeaderboardLadder();
                 }
+            } else {
+                globalState.tournaments = {};
+                globalState.teams = [];
+                globalState.matches = [];
+                globalState.admins = {};
             }
         });
 
+        // Global Event Click Hook to dismiss open account interface menus natively
+        document.addEventListener('click', function() {
+            const drop = document.getElementById('adminProfileDropdown');
+            if (drop) drop.classList.add('hidden');
+        });
+
         /**
-         * System Routing Interface Layer
+         * Application Routing and View Coordination State Machine
          */
         window.router = {
-            userRole: 'public', // 'public' | 'audience' | 'player' | 'admin'
+            currentRole: 'audience', // audience | player | admin
             activeTournamentCode: null,
-            playerAssignedTeamId: '',
+            activePlayerTeamId: null,
             currentTab: 'matches',
-            currentMatchFilter: 'all',
-
-            setRole: function(role) {
-                this.userRole = role;
-                document.getElementById('userRoleBadge').innerText = "Role: " + role;
-                document.getElementById('userRoleBadge').classList.remove('hidden');
-                
-                if(role === 'player') {
-                    document.getElementById('portal-title').innerText = "Player Validation Gate";
-                    document.getElementById('player-identity-box').classList.remove('hidden');
-                    document.getElementById('admin-auth-box').classList.add('hidden');
-                    this.showPanel('view-enter-code');
-                } else if(role === 'audience') {
-                    document.getElementById('portal-title').innerText = "Audience Portal Entry";
-                    document.getElementById('player-identity-box').classList.add('hidden');
-                    document.getElementById('admin-auth-box').classList.add('hidden');
-                    this.showPanel('view-enter-code');
+            
+            go: function(viewId) {
+                const panels = document.querySelectorAll('.view-panel');
+                for(let i=0; i<panels.length; i++) {
+                    panels[i].classList.add('hidden');
                 }
+                document.getElementById(viewId).classList.remove('hidden');
+                window.scrollTo(0,0);
             },
-
+            
             toLogin: function() {
-                this.userRole = 'public';
                 this.activeTournamentCode = null;
-                this.playerAssignedTeamId = '';
-                document.getElementById('userRoleBadge').classList.add('hidden');
+                this.activePlayerTeamId = null;
                 document.getElementById('activeTournamentBadge').classList.add('hidden');
+                document.getElementById('userRoleBadge').classList.add('hidden');
                 document.getElementById('globalTournamentMetaHeader').classList.add('hidden');
-                document.getElementById('adminProfileWrapper').classList.add('hidden');
-                this.showPanel('view-login');
+                document.getElementById('portal-code-input').value = "";
+                document.getElementById('player-team-select').innerHTML = "<option value=''>-- Enter a valid code above first --</option>";
+                
+                // Preserve admin navigation buttons conditionally if an authentication session is currently active
+                if (sessionAdminUser) {
+                    this.go('view-create-tournament');
+                } else {
+                    document.getElementById('adminProfileWrapper').classList.add('hidden');
+                    this.go('view-login');
+                }
+            },
+            
+            setRole: function(role) {
+                this.currentRole = role;
+                const portalTitle = document.getElementById('portal-title');
+                const pIdentityBox = document.getElementById('player-identity-box');
+                const adminAuthBox = document.getElementById('admin-auth-box');
+                
+                pIdentityBox.classList.add('hidden');
+                adminAuthBox.classList.add('hidden');
+                
+                if (role === 'audience') {
+                    portalTitle.innerText = "Audience Portal Entry";
+                } else if (role === 'player') {
+                    portalTitle.innerText = "Player Roster Entry";
+                    pIdentityBox.classList.remove('hidden');
+                }
+                
+                this.go('view-enter-code');
             },
 
+            handleHeaderBrandClick: function() {
+                if (this.activeTournamentCode) {
+                    this.handleDashboardExitClick();
+                } else if (sessionAdminUser) {
+                    this.go('view-create-tournament');
+                } else {
+                    this.toLogin();
+                }
+            },
+            
             submitPortalCode: function() {
-                const codeRaw = document.getElementById('portal-code-input').value;
-                if(!codeRaw) return alert("Please enter an event tracking code.");
-                const targetCode = codeRaw.trim().toUpperCase();
-
-                const tournament = globalState.tournaments[targetCode];
-                if(!tournament) return alert("Tournament profile code match not found in global registry.");
-
-                if(this.userRole === 'admin') {
-                    const secretInput = document.getElementById('portal-admin-code').value;
-                    if(tournament.adminSecretKey !== secretInput) {
-                        return alert("Invalid Admin Validation Access key parameter.");
+                const codeInput = document.getElementById('portal-code-input').value.trim().toUpperCase();
+                if(!codeInput) { alert('Please supply a valid tournament registry access string.'); return; }
+                
+                const tournaments = globalState.tournaments;
+                if(!tournaments[codeInput]) {
+                    alert('Target tournament instance not found in Cloud Database. Verify spelling or build a fresh event configuration.');
+                    return;
+                }
+                
+                if (this.currentRole === 'player') {
+                    const teamSel = document.getElementById('player-team-select');
+                    if(!teamSel.value) {
+                        alert('Please verify tournament tracking roster and select an identity.');
+                        return;
                     }
+                    this.activePlayerTeamId = teamSel.value;
                 }
+                
+                this.activeTournamentCode = codeInput;
+                this.launchDashboardContext();
+            },
 
-                if(this.userRole === 'player') {
-                    const chosenTeam = document.getElementById('player-team-select').value;
-                    if(!chosenTeam) return alert("Please select your valid active player profile identity.");
-                    this.playerAssignedTeamId = chosenTeam;
-                }
-
-                this.activeTournamentCode = targetCode;
-                document.getElementById('activeTournamentBadge').innerText = "ID: " + targetCode;
+            directAdminLaunchTournament: function(code) {
+                this.currentRole = 'admin';
+                this.activeTournamentCode = code;
+                this.activePlayerTeamId = null;
+                this.launchDashboardContext();
+            },
+            
+            launchDashboardContext: function() {
+                document.getElementById('activeTournamentBadge').innerText = "Tourney: " + this.activeTournamentCode;
                 document.getElementById('activeTournamentBadge').classList.remove('hidden');
                 
+                const uBadge = document.getElementById('userRoleBadge');
+                uBadge.innerText = "Role: " + this.currentRole;
+                uBadge.classList.remove('hidden');
+                
+                const adminPanel = document.getElementById('admin-match-actions-card');
+                const pFilters = document.getElementById('player-filter-controls');
+                
+                adminPanel.classList.add('hidden');
+                pFilters.classList.add('hidden');
+                
+                if(this.currentRole === 'admin') adminPanel.classList.remove('hidden');
+                if(this.currentRole === 'player') pFilters.classList.remove('hidden');
+                
                 app.initDashboardDataPipeline();
-                this.toDashboard();
-            },
-
-            toDashboard: function() {
-                this.showPanel('view-dashboard');
                 app.syncTournamentMetaHeaderDisplay();
-                
-                // Show or hide structural components depending on security clearance levels
-                if(this.userRole === 'admin') {
-                    document.getElementById('admin-match-actions-card').classList.remove('hidden');
-                    document.getElementById('player-filter-controls').classList.add('hidden');
-                    document.getElementById('adminEditTournBtn').classList.remove('hidden');
-                } else if(this.userRole === 'player') {
-                    document.getElementById('admin-match-actions-card').classList.add('hidden');
-                    document.getElementById('player-filter-controls').classList.remove('hidden');
-                    document.getElementById('adminEditTournBtn').classList.add('hidden');
-                    app.setMatchFilter('mine');
-                } else {
-                    document.getElementById('admin-match-actions-card').classList.add('hidden');
-                    document.getElementById('player-filter-controls').classList.add('hidden');
-                    document.getElementById('adminEditTournBtn').classList.add('hidden');
-                    app.setMatchFilter('all');
-                }
-                
-                app.populateFilterDropdownElements();
                 this.switchTab('matches');
+                this.go('view-dashboard');
             },
-
+            
             switchTab: function(tabName) {
                 this.currentTab = tabName;
                 document.getElementById('tab-link-matches').classList.remove('active');
                 document.getElementById('tab-link-scoreboard').classList.remove('active');
                 document.getElementById('tab-content-matches').classList.add('hidden');
                 document.getElementById('tab-content-scoreboard').classList.add('hidden');
-
+                
                 if(tabName === 'matches') {
                     document.getElementById('tab-link-matches').classList.add('active');
                     document.getElementById('tab-content-matches').classList.remove('hidden');
@@ -1059,709 +980,648 @@
                 }
             },
 
-            handleHeaderBrandClick: function() {
-                if(this.userRole === 'admin' && sessionAdminUser) {
-                    this.exitActiveTournamentToWorkspace();
+            exitActiveTournamentToWorkspace: function() {
+                if (this.activeTournamentCode) {
+                    this.activeTournamentCode = null;
+                    document.getElementById('activeTournamentBadge').classList.add('hidden');
+                    document.getElementById('userRoleBadge').classList.add('hidden');
+                    document.getElementById('globalTournamentMetaHeader').classList.add('hidden');
+                }
+                if (sessionAdminUser) {
+                    app.renderOwnedTournamentsList();
+                    this.go('view-create-tournament');
                 } else {
                     this.toLogin();
                 }
-            },
-
-            exitActiveTournamentToWorkspace: function() {
-                this.activeTournamentCode = null;
-                app.exitMatchEditMode();
-                document.getElementById('activeTournamentBadge').classList.add('hidden');
-                document.getElementById('globalTournamentMetaHeader').classList.add('hidden');
-                document.getElementById('portal-code-input').value = '';
-                document.getElementById('portal-admin-code').value = '';
-                this.showPanel('view-create-tournament');
-                app.renderOwnedTournamentsList();
             },
 
             handleDashboardExitClick: function() {
-                if(sessionAdminUser) {
+                if(confirm("Confirm structural disconnect from active tournament framework session?")) {
                     this.exitActiveTournamentToWorkspace();
-                } else {
-                    this.toLogin();
                 }
-            },
-
-            promptEditTournamentMeta: function() {
-                if(this.userRole !== 'admin') return;
-                const tourney = globalState.tournaments[this.activeTournamentCode];
-                if(!tourney) return;
-
-                document.getElementById('edit-tourn-name').value = tourney.displayName || '';
-                document.getElementById('edit-tourn-date').value = tourney.calendarDate || '';
-                document.getElementById('edit-tourn-code').value = tourney.uidCode || '';
-                document.getElementById('edit-tourn-secret').value = tourney.adminSecretKey || '';
-                
-                this.showPanel('view-edit-tournament-meta');
-            },
-
-            cancelEditTournamentMeta: function() {
-                this.showPanel('view-dashboard');
-            },
-
-            showPanel: function(panelId) {
-                const views = ['view-login', 'view-enter-code', 'view-create-tournament', 'view-teams-management', 'view-dashboard', 'view-edit-tournament-meta'];
-                views.forEach(v => {
-                    document.getElementById(v).classList.add('hidden');
-                });
-                document.getElementById(panelId).classList.remove('hidden');
-                document.getElementById('adminProfileDropdown').classList.add('hidden');
             }
         };
 
         /**
-         * Authentication Access Management Module 
+         * Authentication Controller Driver Logic
          */
         window.auth = {
             login: function() {
-                const user = document.getElementById('login-user').value.trim();
-                const pass = document.getElementById('login-pass').value;
-                if(!user || !pass) return alert("Please clarify security identifiers completely.");
-
-                const account = globalState.admins[user];
-                if(!account || account.passwordRef !== pass) {
-                    return alert("Invalid authorization tokens submitted.");
-                }
-
-                sessionAdminUser = user;
-                router.userRole = 'admin';
-                document.getElementById('userRoleBadge').innerText = "Role: Admin";
-                document.getElementById('userRoleBadge').classList.remove('hidden');
-                document.getElementById('adminUserMenuBtn').innerText = `Profile: ${user}`;
-                document.getElementById('adminProfileWrapper').classList.remove('hidden');
+                const u = document.getElementById('login-user').value.trim();
+                const p = document.getElementById('login-pass').value.trim();
                 
-                router.showPanel('view-create-tournament');
-                app.renderOwnedTournamentsList();
+                if(!u || !p) { alert('Credential verification inputs required.'); return; }
+                
+                const dbRef = ref(database);
+                get(child(dbRef, 'admins/' + u)).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const adminData = snapshot.val();
+                        if (adminData.password === p) {
+                            sessionAdminUser = u;
+                            router.currentRole = 'admin';
+                            
+                            document.getElementById('adminUserMenuBtn').innerText = "Account: " + u;
+                            document.getElementById('adminProfileWrapper').classList.remove('hidden');
+                            
+                            app.renderOwnedTournamentsList();
+                            router.go('view-create-tournament');
+                            
+                            document.getElementById('login-user').value = "";
+                            document.getElementById('login-pass').value = "";
+                        } else {
+                            alert("Authentication Failure: Incorrect password supplied.");
+                        }
+                    } else {
+                        alert("Authentication Failure: Target Admin Username record not found.");
+                    }
+                }).catch(err => alert("Database Gateway Error: " + err.message));
             },
 
             register: function() {
-                const user = document.getElementById('login-user').value.trim();
-                const pass = document.getElementById('login-pass').value;
-                if(!user || !pass) return alert("Registration criteria fields require characters.");
-                if(user.length < 3) return alert("Username payload context is too brief.");
-
-                if(globalState.admins[user]) {
-                    return alert("This admin username is already registered.");
+                const u = document.getElementById('login-user').value.trim();
+                const p = document.getElementById('login-pass').value.trim();
+                
+                if(!u || !p) { alert('Username and Password parameters required to initialize registration.'); return; }
+                if(u.includes('.') || u.includes('#') || u.includes('$') || u.includes('[') || u.includes(']')) {
+                    alert('Username format violation: Characters ".", "#", "$", "[", or "]" are prohibited.');
+                    return;
                 }
 
-                set(ref(database, `admins/${user}`), {
-                    usernameId: user,
-                    passwordRef: pass,
-                    createdTimestamp: Date.now()
-                }).then(() => {
-                    alert("Admin registration accepted successfully! Please sign in.");
-                });
+                const dbRef = ref(database);
+                get(child(dbRef, 'admins/' + u)).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        alert("Conflict Error: Admin username identity already claimed on Firebase network.");
+                    } else {
+                        set(ref(database, 'admins/' + u), {
+                            username: u,
+                            password: p
+                        }).then(() => {
+                            alert("Success: Administrative profile committed to database node. Please click Sign In to enter.");
+                        });
+                    }
+                }).catch(err => alert("Database Storage Error: " + err.message));
             },
 
             logout: function() {
                 sessionAdminUser = null;
-                router.toLogin();
+                router.currentRole = 'audience';
+                router.activeTournamentCode = null;
+                router.activePlayerTeamId = null;
+                
+                document.getElementById('adminProfileWrapper').classList.add('hidden');
+                document.getElementById('activeTournamentBadge').classList.add('hidden');
+                document.getElementById('userRoleBadge').classList.add('hidden');
+                document.getElementById('globalTournamentMetaHeader').classList.add('hidden');
+                
+                router.go('view-login');
             }
         };
 
         /**
-         * Base Core App Controller Logic 
+         * Core ScorePickle State Mutation & Render Processing Pipeline
          */
         window.app = {
-            localTeamsArrayBuffer: [],
-
+            matchFilter: 'all', // all | mine
+            
             handlePortalCodeInput: function(val) {
-                const code = val.trim().toUpperCase();
-                const selectElement = document.getElementById('player-team-select');
-                selectElement.innerHTML = '<option value="">-- Choose Profile Identity --</option>';
-
-                if(code.length >= 2 && globalState.tournaments[code]) {
-                    const matchedTeams = globalState.teams.filter(t => t.tournamentRefCode === code);
-                    if(matchedTeams.length === 0) {
-                        selectElement.innerHTML = '<option value="">(No registered roster groups found)</option>';
+                const cleanCode = val.trim().toUpperCase();
+                if (router.currentRole === 'player' && cleanCode.length >= 3) {
+                    const filteredTeams = globalState.teams.filter(t => t.tournamentCode === cleanCode);
+                    const selectEl = document.getElementById('player-team-select');
+                    selectEl.innerHTML = "";
+                    
+                    if(filteredTeams.length > 0) {
+                        filteredTeams.forEach(t => {
+                            let opt = document.createElement('option');
+                            opt.value = t.id;
+                            opt.innerText = t.name;
+                            selectEl.appendChild(opt);
+                        });
+                    } else {
+                        selectEl.innerHTML = "<option value=''>-- No registered teams discovered --</option>";
                     }
-                    matchedTeams.forEach(t => {
-                        selectElement.innerHTML += `<option value="${t.teamId}">${t.teamNameText}</option>`;
-                    });
-                } else {
-                    selectElement.innerHTML = '<option value="">-- Enter a valid code above first --</option>';
                 }
             },
 
-            executeCreateTournament: function() {
-                const name = document.getElementById('create-tourn-name').value.trim();
-                const date = document.getElementById('create-tourn-date').value;
-                const code = document.getElementById('create-tourn-code').value.trim().toUpperCase();
-                const secret = document.getElementById('create-tourn-secret').value.trim();
-
-                if(!name || !date || !code || !secret) {
-                    return alert("All tournament specifications parameters must be filled.");
+            syncTournamentMetaHeaderDisplay: function() {
+                const rootHeader = document.getElementById('globalTournamentMetaHeader');
+                if (!router.activeTournamentCode) {
+                    rootHeader.classList.add('hidden');
+                    return;
                 }
 
-                if(globalState.tournaments[code]) {
-                    return alert("This custom code is taken. Please implement another string identifier.");
+                const currentTourn = globalState.tournaments[router.activeTournamentCode];
+                if (currentTourn) {
+                    document.getElementById('metaHeaderTitle').innerText = currentTourn.name;
+                    const dateString = currentTourn.date ? ` • Scheduled: ${currentTourn.date}` : "";
+                    document.getElementById('metaHeaderSub').innerText = `Organized by: ${currentTourn.adminName || currentTourn.creator || 'Staff'}${dateString}`;
+                    rootHeader.classList.remove('hidden');
+                } else {
+                    rootHeader.classList.add('hidden');
                 }
-
-                const newTourn = {
-                    uidCode: code,
-                    displayName: name,
-                    calendarDate: date,
-                    adminSecretKey: secret,
-                    ownerAdminRef: sessionAdminUser,
-                    hasRosterCommitted: false
-                };
-
-                set(ref(database, `tournaments/${code}`), newTourn).then(() => {
-                    router.activeTournamentCode = code;
-                    document.getElementById('activeTournamentBadge').innerText = "ID: " + code;
-                    document.getElementById('activeTournamentBadge').classList.remove('hidden');
-                    this.initRosterCreationWorkspace();
-                });
             },
 
             renderOwnedTournamentsList: function() {
                 const root = document.getElementById('ownedTournamentsRoot');
-                root.innerHTML = '';
-                
-                const personalList = Object.values(globalState.tournaments).filter(t => t.ownerAdminRef === sessionAdminUser);
-                if(personalList.length === 0) {
-                    root.innerHTML = '<p style="font-size:0.8rem; color:var(--text-secondary);">No tournaments created under this profile account yet.</p>';
+                if (!root) return;
+                root.innerHTML = "";
+
+                const allTournies = Object.values(globalState.tournaments);
+                // Filter items created by or linked directly to the current authenticated account profile
+                const filtered = allTournies.filter(t => t.creator === sessionAdminUser);
+
+                if (filtered.length === 0) {
+                    root.innerHTML = "<div style='font-size:0.85rem; color:var(--text-secondary); text-align:center; padding:15px;'>No event assets linked to this account database structure yet.</div>";
                     return;
                 }
 
-                personalList.forEach(t => {
+                filtered.forEach(t => {
                     const card = document.createElement('div');
                     card.className = 'tournament-list-card';
                     
                     card.innerHTML = `
                         <div class="tourn-card-info">
-                            <div class="tourn-card-title" onclick="app.bypassAuthGateToTournament('${t.uidCode}')">${t.displayName}</div>
-                            <div class="tourn-card-meta">Code: <strong>${t.uidCode}</strong> &nbsp;|&nbsp; Scheduled: ${t.calendarDate} &nbsp;|&nbsp; Key: ${t.adminSecretKey}</div>
+                            <div class="tourn-card-title" onclick="router.directAdminLaunchTournament('${t.code}')">${t.name}</div>
+                            <div class="tourn-card-meta">
+                                <strong>Date:</strong> ${t.date || 'Unspecified'} &nbsp;|&nbsp; 
+                                <strong>Event Code:</strong> <span style="color:var(--primary-blue); font-weight:700;">${t.code}</span> &nbsp;|&nbsp; 
+                                <strong>Admin Key:</strong> <code>${t.adminCode}</code>
+                            </div>
                         </div>
                         <div class="tourn-card-actions">
-                            <button class="btn btn-secondary" style="padding:4px 8px; font-size:0.75rem; margin-bottom:0;" onclick="app.routeToSpecificRosterModification('${t.uidCode}')">Roster</button>
+                            <button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="app.executeDeleteEntireTournament('${t.code}')">🗑️</button>
                         </div>
                     `;
                     root.appendChild(card);
                 });
             },
-
-            bypassAuthGateToTournament: function(code) {
-                router.userRole = 'admin';
-                document.getElementById('userRoleBadge').innerText = "Role: Admin";
-                document.getElementById('userRoleBadge').classList.remove('hidden');
-                router.activeTournamentCode = code;
-                document.getElementById('activeTournamentBadge').innerText = "ID: " + code;
-                document.getElementById('activeTournamentBadge').classList.remove('hidden');
-                router.toDashboard();
-            },
-
-            routeToSpecificRosterModification: function(code) {
-                router.activeTournamentCode = code;
-                this.initRosterCreationWorkspace();
-            },
-
-            initRosterCreationWorkspace: function() {
-                router.showPanel('view-teams-management');
-                const matchedTeams = globalState.teams.filter(t => t.tournamentRefCode === router.activeTournamentCode);
+            
+            executeCreateTournament: function() {
+                const name = document.getElementById('create-tourn-name').value.trim();
+                const dateVal = document.getElementById('create-tourn-date').value;
+                const code = document.getElementById('create-tourn-code').value.trim().toUpperCase();
+                const secret = document.getElementById('create-tourn-secret').value.trim();
                 
-                this.localTeamsArrayBuffer = [];
-                const root = document.getElementById('dynamic-team-rows-root');
-                root.innerHTML = '';
+                if(!name || !dateVal || !code || !secret) { alert('All configuration setup inputs, including date records, are strictly mandatory.'); return; }
+                if(!sessionAdminUser) { alert('Session loss context error: Please authenticate admin profile state again.'); return; }
+                
+                if(globalState.tournaments[code]) { alert('Conflict: Tournament Registry String Code already claimed on Firebase network.'); return; }
+                
+                // Write tournament tracking definition block directly to Cloud Database
+                set(ref(database, 'tournaments/' + code), {
+                    name: name,
+                    date: dateVal,
+                    creator: sessionAdminUser,
+                    adminName: sessionAdminUser, // Backward compatibility fallback string mapper link
+                    adminCode: secret,
+                    code: code
+                }).then(() => {
+                    router.activeTournamentCode = code;
+                    router.currentRole = 'admin';
+                    
+                    document.getElementById('create-tourn-name').value = "";
+                    document.getElementById('create-tourn-date').value = "";
+                    document.getElementById('create-tourn-code').value = "";
+                    document.getElementById('create-tourn-secret').value = "";
 
-                if(matchedTeams.length > 0) {
+                    document.getElementById('dynamic-team-rows-root').innerHTML = "";
+                    app.addNewTeamInputRow();
+                    app.updateTeamUIBadgeCount();
+                    router.go('view-teams-management');
+                }).catch(err => alert("Cloud Error: " + err.message));
+            },
+
+            executeDeleteEntireTournament: function(tournCode) {
+                const target = globalState.tournaments[tournCode];
+                if (!target) return;
+
+                const confPrompt = `⚠️ IRREVERSIBLE DESTRUCTION WARNING ⚠️\n\nAre you absolutely certain you want to completely DELETE the tournament instance:\n"${target.name}" (${tournCode})?\n\nThis completely deletes all registered team items, rosters, and match data assets. This action cannot be reversed!`;
+                
+                if (confirm(confPrompt)) {
+                    let updates = {};
+                    updates['tournaments/' + tournCode] = null;
+                    
+                    // Clear matched teams safely
+                    globalState.teams.forEach(t => {
+                        if (t.tournamentCode === tournCode) updates['teams/' + t.id] = null;
+                    });
+                    
+                    // Clear matched records safely
+                    globalState.matches.forEach(m => {
+                        if (m.tournamentCode === tournCode) updates['matches/' + m.id] = null;
+                    });
+
+                    update(ref(database), updates).then(() => {
+                        alert("Tournament instance metadata cleanly purged from database.");
+                        app.renderOwnedTournamentsList();
+                    }).catch(err => alert("Purge Gateway failure: " + err.message));
+                }
+            },
+            
+            addNewTeamInputRow: function() {
+                const root = document.getElementById('dynamic-team-rows-root');
+                const rowId = 'tr_' + Math.random().toString(36).substr(2, 9);
+                
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'dynamic-input-row';
+                rowDiv.id = rowId;
+                
+                rowDiv.innerHTML = `
+                    <div class="row-cell-input">
+                        <input type="text" class="input-field team-roster-name-input" placeholder="Enter uniquely identified team name...">
+                    </div>
+                    <div class="row-cell-action">
+                        <button class="btn btn-danger" onclick="app.removeTeamInputRow('${rowId}')">🗑️</button>
+                    </div>
+                `;
+                root.appendChild(rowDiv);
+                
+                const input = rowDiv.querySelector('.team-roster-name-input');
+                input.addEventListener('keydown', function(e) {
+                    if(e.key === 'Enter') {
+                        e.preventDefault();
+                        app.addNewTeamInputRow();
+                        setTimeout(() => {
+                            const inputs = document.querySelectorAll('.team-roster-name-input');
+                            if(inputs.length > 0) inputs[inputs.length - 1].focus();
+                        }, 50);
+                    }
+                });
+                
+                this.updateTeamUIBadgeCount();
+            },
+            
+            removeTeamInputRow: function(rowId) {
+                const row = document.getElementById(rowId);
+                if(row) row.parentNode.removeChild(row);
+                this.updateTeamUIBadgeCount();
+            },
+            
+            updateTeamUIBadgeCount: function() {
+                const count = document.querySelectorAll('.team-roster-name-input').length;
+                document.getElementById('team-counter-badge').innerText = "Total Rows: " + count;
+            },
+
+            checkRosterNavigationEligibility: function() {
+                const currentTournamentMatches = globalState.matches.filter(m => m.tournamentCode === router.activeTournamentCode);
+                
+                if (currentTournamentMatches.length > 0) {
+                    alert("Roster Alteration Terminated: Modifying the team roster is prohibited because there are active or completed match records established in this tournament.");
+                    return;
+                }
+
+                // Render matching active entities into input nodes smoothly
+                const root = document.getElementById('dynamic-team-rows-root');
+                root.innerHTML = "";
+                const matchedTeams = globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode);
+
+                if (matchedTeams.length > 0) {
                     matchedTeams.forEach(t => {
-                        this.localTeamsArrayBuffer.push(t.teamNameText);
+                        const rowId = 'tr_' + Math.random().toString(36).substr(2, 9);
+                        const rowDiv = document.createElement('div');
+                        rowDiv.className = 'dynamic-input-row';
+                        rowDiv.id = rowId;
+                        rowDiv.innerHTML = `
+                            <div class="row-cell-input">
+                                <input type="text" class="input-field team-roster-name-input" value="${t.name}" placeholder="Enter uniquely identified team name...">
+                            </div>
+                            <div class="row-cell-action">
+                                <button class="btn btn-danger" onclick="app.removeTeamInputRow('${rowId}')">🗑️</button>
+                            </div>
+                        `;
+                        root.appendChild(rowDiv);
                     });
                 } else {
-                    this.localTeamsArrayBuffer = ["Team Alpha", "Team Beta"];
+                    app.addNewTeamInputRow();
                 }
-                this.renderDynamicTeamInputRows();
+
+                app.updateTeamUIBadgeCount();
+                router.go('view-teams-management');
             },
-
-            renderDynamicTeamInputRows: function() {
-                const root = document.getElementById('dynamic-team-rows-root');
-                root.innerHTML = '';
-                
-                this.localTeamsArrayBuffer.forEach((val, idx) => {
-                    const row = document.createElement('div');
-                    row.className = 'dynamic-input-row';
-                    row.innerHTML = `
-                        <div class="row-cell-input">
-                            <input type="text" class="input-field dynamic-team-input-item" value="${val}" placeholder="Enter roster label team name" onchange="app.syncTeamBufferTextElement(${idx}, this.value)">
-                        </div>
-                        <div class="row-cell-action">
-                            <button class="btn btn-danger" onclick="app.removeTeamBufferRow(${idx})">× Remove</button>
-                        </div>
-                    `;
-                    root.appendChild(row);
-                });
-
-                document.getElementById('team-counter-badge').innerText = `Total Teams: ${this.localTeamsArrayBuffer.length}`;
-            },
-
-            syncTeamBufferTextElement: function(idx, val) {
-                this.localTeamsArrayBuffer[idx] = val.trim();
-            },
-
-            addNewTeamInputRow: function() {
-                this.localTeamsArrayBuffer.push(`Team ${String.fromCharCode(65 + this.localTeamsArrayBuffer.length)}`);
-                this.renderDynamicTeamInputRows();
-            },
-
-            removeTeamBufferRow: function(idx) {
-                this.localTeamsArrayBuffer.splice(idx, 1);
-                this.renderDynamicTeamInputRows();
-            },
-
+            
             submitTeamRoster: function() {
-                if(this.localTeamsArrayBuffer.length < 2) return alert("A minimum roster sequence configuration of 2 teams is required.");
+                // Strict redundant safety evaluation constraint checks
+                const currentTournamentMatches = globalState.matches.filter(m => m.tournamentCode === router.activeTournamentCode);
+                if (currentTournamentMatches.length > 0) {
+                    alert("Roster Submission Terminated: Modification rejected. Existing match entities mapped to this tournament block require locking structural dimensions.");
+                    router.launchDashboardContext();
+                    return;
+                }
+
+                const inputs = document.querySelectorAll('.team-roster-name-input');
+                let updates = {};
+                let count = 0;
                 
-                // Clear obsolete roster elements under this specific jurisdiction node first
-                const matchedTeams = globalState.teams.filter(t => t.tournamentRefCode === router.activeTournamentCode);
-                matchedTeams.forEach(t => {
-                    set(ref(database, `teams/${t.teamId}`), null);
+                // Clear out previous entries assigned to this code block to support dynamic overwrites safely
+                globalState.teams.forEach(t => {
+                    if(t.tournamentCode === router.activeTournamentCode) {
+                        updates['teams/' + t.id] = null;
+                    }
                 });
-
-                const savePromises = this.localTeamsArrayBuffer.map((name, idx) => {
-                    const cleanName = name || `Unnamed Team ${idx+1}`;
-                    const customId = `team_${router.activeTournamentCode}_${Date.now()}_${idx}`;
-                    return set(ref(database, `teams/${customId}`), {
-                        teamId: customId,
-                        tournamentRefCode: router.activeTournamentCode,
-                        teamNameText: cleanName,
-                        sortIndexOrder: idx
-                    });
-                });
-
-                Promise.all(savePromises).then(() => {
-                    update(ref(database, `tournaments/${router.activeTournamentCode}`), {
-                        hasRosterCommitted: true
-                    });
-                    alert("Roster registry successfully updated and written to disk cloud profile!");
-                    router.toDashboard();
+                
+                for(let i=0; i<inputs.length; i++) {
+                    let val = inputs[i].value.trim();
+                    if(val) {
+                        let newId = 'team_' + Math.random().toString(36).substr(2, 9) + '_' + i;
+                        updates['teams/' + newId] = {
+                            id: newId,
+                            tournamentCode: router.activeTournamentCode,
+                            name: val
+                        };
+                        count++;
+                    }
+                }
+                
+                if(count < 2) { alert('Minimum system processing threshold requires at least 2 distinct teams.'); return; }
+                
+                update(ref(database), updates).then(() => {
+                    alert('Saved ' + count + ' team data assets to Google Firebase Node.');
+                    router.launchDashboardContext();
                 });
             },
-
+            
             initDashboardDataPipeline: function() {
-                const currentTournamentTeams = globalState.teams.filter(t => t.tournamentRefCode === router.activeTournamentCode);
+                const filteredTeams = globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode);
                 
-                // Populate Admin Input Select Dropdowns securely
                 const t1Select = document.getElementById('match-create-t1');
                 const t2Select = document.getElementById('match-create-t2');
                 
-                if(t1Select && t2Select) {
-                    t1Select.innerHTML = '';
-                    t2Select.innerHTML = '';
-                    currentTournamentTeams.forEach(t => {
-                        t1Select.innerHTML += `<option value="${t.teamId}">${t.teamNameText}</option>`;
-                        t2Select.innerHTML += `<option value="${t.teamId}">${t.teamNameText}</option>`;
-                    });
+                if(!t1Select || !t2Select) return;
+                
+                t1Select.innerHTML = "";
+                t2Select.innerHTML = "";
+                
+                for(let i=0; i<filteredTeams.length; i++) {
+                    let o1 = document.createElement('option'); o1.value = filteredTeams[i].id; o1.innerText = filteredTeams[i].name;
+                    let o2 = document.createElement('option'); o2.value = filteredTeams[i].id; o2.innerText = filteredTeams[i].name;
+                    t1Select.appendChild(o1);
+                    t2Select.appendChild(o2);
                 }
                 
-                this.syncAdminScoringDropdownSelections();
+                this.syncAdminScoreSelectionDropdown(filteredTeams);
             },
-
-            syncAdminScoringDropdownSelections: function() {
-                const currentTournamentMatches = globalState.matches.filter(m => m.tournamentRefCode === router.activeTournamentCode);
-                const scoreSelect = document.getElementById('admin-score-match-select');
-                if(!scoreSelect) return;
-
-                scoreSelect.innerHTML = '';
-                if(currentTournamentMatches.length === 0) {
-                    scoreSelect.innerHTML = '<option value="">(No active matches available)</option>';
-                    return;
-                }
-
-                currentTournamentMatches.forEach(m => {
-                    const t1Name = this.getTeamNameById(m.team1Id);
-                    const t2Name = this.getTeamNameById(m.team2Id);
-                    const customDisplayTitle = m.customMatchName ? m.customMatchName : m.generatedSerialName;
-                    const scoreStatusString = m.isCompleted ? ` [Score: ${m.team1Score} - ${m.team2Score}]` : ` [${m.matchStatusValue.toUpperCase()}]`;
-                    scoreSelect.innerHTML += `<option value="${m.matchId}">${customDisplayTitle}: ${t1Name} vs ${t2Name}${scoreStatusString}</option>`;
+            
+            syncAdminScoreSelectionDropdown: function(cachedFilteredTeams) {
+                const fMatches = globalState.matches.filter(m => m.tournamentCode === router.activeTournamentCode);
+                const teamsMap = {};
+                
+                const teamsList = cachedFilteredTeams || globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode);
+                teamsList.forEach(t => { teamsMap[t.id] = t.name; });
+                
+                const mSelect = document.getElementById('admin-score-match-select');
+                if(!mSelect) return;
+                
+                const cachedSelectionVal = mSelect.value;
+                mSelect.innerHTML = "<option value=''>-- Choose Target Match Node --</option>";
+                
+                fMatches.forEach(m => {
+                    let opt = document.createElement('option');
+                    opt.value = m.id;
+                    let label = `${teamsMap[m.team1Id] || 'Deleted'} vs ${teamsMap[m.team2Id] || 'Deleted'} (${m.court || 'No Court'}) [${m.status.toUpperCase()}]`;
+                    opt.innerText = label;
+                    mSelect.appendChild(opt);
                 });
 
+                if (cachedSelectionVal && fMatches.some(m => m.id === cachedSelectionVal)) {
+                    mSelect.value = cachedSelectionVal;
+                }
+                
                 this.syncScoreFieldsWithSelectedMatch();
             },
-
+            
             syncScoreFieldsWithSelectedMatch: function() {
                 const matchId = document.getElementById('admin-score-match-select').value;
+                const lbl1 = document.getElementById('label-score-t1');
+                const lbl2 = document.getElementById('label-score-t2');
+                
                 if(!matchId) {
-                    document.getElementById('admin-score-t1').value = '';
-                    document.getElementById('admin-score-t2').value = '';
-                    document.getElementById('label-score-t1').innerText = "Team 1 Score";
-                    document.getElementById('label-score-t2').innerText = "Team 2 Score";
+                    if(lbl1) lbl1.innerText = "Team 1 Score";
+                    if(lbl2) lbl2.innerText = "Team 2 Score";
+                    document.getElementById('admin-score-t1').value = "";
+                    document.getElementById('admin-score-t2').value = "";
                     return;
                 }
-
-                const match = globalState.matches.find(m => m.matchId === matchId);
-                if(match) {
-                    document.getElementById('admin-score-t1').value = match.team1Score !== undefined ? match.team1Score : 0;
-                    document.getElementById('admin-score-t2').value = match.team2Score !== undefined ? match.team2Score : 0;
-                    document.getElementById('label-score-t1').innerText = this.getTeamNameById(match.team1Id) + " Score";
-                    document.getElementById('label-score-t2').innerText = this.getTeamNameById(match.matchId ? match.team2Id : '') + " Score";
+                
+                const target = globalState.matches.find(m => m.id === matchId);
+                if(target) {
+                    const t1 = globalState.teams.find(t => t.id === target.team1Id);
+                    const t2 = globalState.teams.find(t => t.id === target.team2Id);
+                    
+                    if(lbl1) lbl1.innerText = (t1 ? t1.name : "Team 1") + " Score";
+                    if(lbl2) lbl2.innerText = (t2 ? t2.name : "Team 2") + " Score";
+                    
+                    document.getElementById('admin-score-t1').value = target.team1Score || 0;
+                    document.getElementById('admin-score-t2').value = target.team2Score || 0;
                 }
             },
-
-            // EDIT MATCH FEATURE: Loads full properties of a match back to the primary match creation form
-            loadSelectedMatchToEditor: function() {
-                const matchId = document.getElementById('admin-score-match-select').value;
-                if(!matchId) return alert("Please pick an existing match from the selector drop-down to edit.");
-
-                const match = globalState.matches.find(m => m.matchId === matchId);
-                if(!match) return;
-
-                targetedEditMatchId = matchId;
-                
-                // Set UI indication to edit mode state
-                document.getElementById('edit-mode-indicator-box').style.display = 'block';
-                document.getElementById('btnSubmitMatchForm').innerText = "Apply / Update Match Modifications";
-                document.getElementById('btnSubmitMatchForm').style.backgroundColor = "var(--accent-green)";
-
-                // Fill form details with existing records
-                document.getElementById('match-create-name').value = match.customMatchName || '';
-                document.getElementById('match-create-t1').value = match.team1Id;
-                document.getElementById('match-create-t2').value = match.team2Id;
-                document.getElementById('match-create-court').value = match.courtLocation || '';
-                document.getElementById('match-create-status').value = match.matchStatusValue || 'pending';
-            },
-
-            exitMatchEditMode: function() {
-                targetedEditMatchId = null;
-                const indBox = document.getElementById('edit-mode-indicator-box');
-                if(indBox) indBox.style.display = 'none';
-                
-                const subBtn = document.getElementById('btnSubmitMatchForm');
-                if(subBtn) {
-                    subBtn.innerText = "Submit Pair Match";
-                    subBtn.style.backgroundColor = "var(--primary-blue)";
-                }
-
-                // Clear input boxes safely
-                const mName = document.getElementById('match-create-name');
-                const mCourt = document.getElementById('match-create-court');
-                if(mName) mName.value = '';
-                if(mCourt) mCourt.value = '';
-            },
-
+            
             executeCreateMatch: function() {
                 const t1 = document.getElementById('match-create-t1').value;
                 const t2 = document.getElementById('match-create-t2').value;
-                const court = document.getElementById('match-create-court').value.trim() || "Unassigned Court";
-                const customName = document.getElementById('match-create-name').value.trim();
-                const statusSelect = document.getElementById('match-create-status').value;
-
-                if(!t1 || !t2) return alert("Roster node pairs must be verified.");
-                if(t1 === t2) return alert("A team identity element cannot encounter itself.");
-
-                const currentTournamentMatches = globalState.matches.filter(m => m.tournamentRefCode === router.activeTournamentCode);
-
-                if(targetedEditMatchId) {
-                    // Update current record context node keeping historic arrays non-destructive
-                    const existingMatch = globalState.matches.find(m => m.matchId === targetedEditMatchId);
-                    const updatePayload = {
-                        team1Id: t1,
-                        team2Id: t2,
-                        courtLocation: court,
-                        customMatchName: customName || null,
-                        matchStatusValue: statusSelect,
-                        isCompleted: statusSelect === 'completed'
-                    };
-
-                    update(ref(database, `matches/${targetedEditMatchId}`), updatePayload).then(() => {
-                        alert("Match record updated successfully!");
-                        this.exitMatchEditMode();
-                    });
-
-                } else {
-                    // Create mode operation path
-                    const sequentialSerialId = currentTournamentMatches.length + 1;
-                    const uniqueMatchId = `match_${router.activeTournamentCode}_${Date.now()}`;
-                    
-                    const freshMatchObject = {
-                        matchId: uniqueMatchId,
-                        tournamentRefCode: router.activeTournamentCode,
-                        generatedSerialName: `Match ${sequentialSerialId}`,
-                        customMatchName: customName ? customName : null,
-                        team1Id: t1,
-                        team2Id: t2,
-                        courtLocation: court,
-                        team1Score: 0,
-                        team2Score: 0,
-                        isCompleted: statusSelect === 'completed',
-                        matchStatusValue: statusSelect,
-                        creationEpoch: Date.now()
-                    };
-
-                    set(ref(database, `matches/${uniqueMatchId}`), freshMatchObject).then(() => {
-                        document.getElementById('match-create-name').value = '';
-                        document.getElementById('match-create-court').value = '';
-                        document.getElementById('match-create-status').value = 'pending';
-                    });
-                }
+                const court = document.getElementById('match-create-court').value.trim() || "Main Court";
+                
+                if(!t1 || !t2) { alert('Requires structural team mapping validation inputs.'); return; }
+                if(t1 === t2) { alert('Self-pairing rule violation: A team cannot play against itself.'); return; }
+                
+                const matchId = 'match_' + Math.random().toString(36).substr(2, 9);
+                const newMatch = {
+                    id: matchId,
+                    tournamentCode: router.activeTournamentCode,
+                    team1Id: t1,
+                    team2Id: t2,
+                    team1Score: 0,
+                    team2Score: 0,
+                    court: court,
+                    status: 'pending'
+                };
+                
+                set(ref(database, 'matches/' + matchId), newMatch).then(() => {
+                    document.getElementById('match-create-court').value = "";
+                    this.initDashboardDataPipeline();
+                });
             },
-
+            
             executeSubmitScores: function() {
                 const matchId = document.getElementById('admin-score-match-select').value;
-                if(!matchId) return alert("Select an active matchup target node entry.");
-
-                const s1 = parseInt(document.getElementById('admin-score-t1').value) || 0;
-                const s2 = parseInt(document.getElementById('admin-score-t2').value) || 0;
-
-                if(s1 < 0 || s2 < 0) return alert("Score values cannot reflect negative metrics.");
-
-                const matchRef = globalState.matches.find(m => m.matchId === matchId);
+                const s1Str = document.getElementById('admin-score-t1').value;
+                const s2Str = document.getElementById('admin-score-t2').value;
                 
-                // If scores are updated via this sub-bar, status becomes completed unless it was set otherwise
-                let defaultStatus = 'completed';
-                if(matchRef && matchRef.matchStatusValue && matchRef.matchStatusValue !== 'completed') {
-                    // If it was already customized in editor mode, maintain integrity or ask to mark complete
-                    defaultStatus = matchRef.matchStatusValue;
-                }
+                if(!matchId || s1Str === "" || s2Str === "") { alert('Ensure valid target node mapping and point integer allocations.'); return; }
                 
-                // For simplicity, submitting score commits to complete status context
-                update(ref(database, `matches/${matchId}`), {
-                    team1Score: s1,
-                    team2Score: s2,
-                    isCompleted: true,
-                    matchStatusValue: 'completed'
-                }).then(() => {
-                    alert("Match dynamic scores log committed!");
+                const s1 = parseInt(s1Str, 10);
+                const s2 = parseInt(s2Str, 10);
+                
+                if(s1 === s2) { alert('Tie states are unsupported by club tournament regulations. Win by advantage metrics required.'); return; }
+                
+                const updates = {};
+                updates[`matches/${matchId}/team1Score`] = s1;
+                updates[`matches/${matchId}/team2Score`] = s2;
+                updates[`matches/${matchId}/status`] = 'completed';
+                
+                update(ref(database), updates).then(() => {
+                    document.getElementById('admin-score-match-select').value = "";
+                    document.getElementById('admin-score-t1').value = "";
+                    document.getElementById('admin-score-t2').value = "";
+                    this.initDashboardDataPipeline();
                 });
             },
 
             executeDeleteSelectedMatch: function() {
                 const matchId = document.getElementById('admin-score-match-select').value;
-                if(!matchId) return alert("Select a match target node to destroy.");
-                
-                if(confirm("Are you sure you want to delete this match fixture entirely?")) {
-                    if(targetedEditMatchId === matchId) this.exitMatchEditMode();
-                    set(ref(database, `matches/${matchId}`), null).then(() => {
-                        alert("Match entry permanently dropped.");
-                    });
-                }
-            },
+                if (!matchId) { alert('Please choose an item inside the target selection dropdown list to remove.'); return; }
 
-            // POPULATE ADVANCED PARAMETER FILTER ARRAYS DROPDOWN MENUS
-            populateFilterDropdownElements: function() {
-                const currentTournamentTeams = globalState.teams.filter(t => t.tournamentRefCode === router.activeTournamentCode);
-                const currentTournamentMatches = globalState.matches.filter(m => m.tournamentRefCode === router.activeTournamentCode);
+                const targetMatch = globalState.matches.find(m => m.id === matchId);
+                if (!targetMatch) return;
 
-                const teamSelect = document.getElementById('filter-dropdown-team');
-                const locSelect = document.getElementById('filter-dropdown-location');
-
-                if(teamSelect) {
-                    teamSelect.innerHTML = '<option value="all">All Active Teams</option>';
-                    currentTournamentTeams.forEach(t => {
-                        teamSelect.innerHTML += `<option value="${t.teamId}">${t.teamNameText}</option>`;
-                    });
-                }
-
-                if(locSelect) {
-                    locSelect.innerHTML = '<option value="all">All Courts/Locations</option>';
-                    // Extract unique court string elements safely
-                    const uniqueCourts = [];
-                    currentTournamentMatches.forEach(m => {
-                        if(m.courtLocation && !uniqueCourts.includes(m.courtLocation)) {
-                            uniqueCourts.push(m.courtLocation);
-                        }
-                    });
-                    uniqueCourts.forEach(c => {
-                        locSelect.innerHTML += `<option value="${c}">${c}</option>`;
-                    });
-                }
-            },
-
-            triggerFilterUpdate: function() {
-                this.renderMatchesContainer();
-            },
-
-            setMatchFilter: function(type) {
-                router.currentMatchFilter = type;
-                document.getElementById('filter-pill-all').classList.remove('active');
-                document.getElementById('filter-pill-mine').classList.remove('active');
-
-                if(type === 'all') {
-                    document.getElementById('filter-pill-all').classList.add('active');
-                } else {
-                    document.getElementById('filter-pill-mine').classList.add('active');
-                }
-                this.renderMatchesContainer();
-            },
-
-            renderMatchesContainer: function() {
-                const root = document.getElementById('matches-list-root');
-                root.innerHTML = '';
-
-                let filteredList = globalState.matches.filter(m => m.tournamentRefCode === router.activeTournamentCode);
-
-                // Sort Protocol Implementation: 
-                // Prioritize "about-to-play" matches to top, then secondary ordering based on original timestamp
-                filteredList.sort((a, b) => {
-                    const statusA = a.matchStatusValue === 'about-to-play' ? 1 : 0;
-                    const statusB = b.matchStatusValue === 'about-to-play' ? 1 : 0;
-                    if(statusA !== statusB) {
-                        return statusB - statusA; // 1 goes to top above 0
-                    }
-                    return a.creationEpoch - b.creationEpoch; // fallback chronological
+                const teamsMap = {};
+                globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode).forEach(t => {
+                    teamsMap[t.id] = t.name;
                 });
 
-                // Context Filter Array Check (Player Role Constraint context bypass)
-                if(router.userRole === 'player' && router.currentMatchFilter === 'mine') {
-                    filteredList = filteredList.filter(m => m.team1Id === router.playerAssignedTeamId || m.team2Id === router.playerAssignedTeamId);
-                }
+                const t1 = teamsMap[targetMatch.team1Id] || "Deleted Team";
+                const t2 = teamsMap[targetMatch.team2Id] || "Deleted Team";
 
-                // Dropdown Parameters Evaluation Array
-                const fTeam = document.getElementById('filter-dropdown-team') ? document.getElementById('filter-dropdown-team').value : 'all';
-                const fLoc = document.getElementById('filter-dropdown-location') ? document.getElementById('filter-dropdown-location').value : 'all';
-                const fStatus = document.getElementById('filter-dropdown-status') ? document.getElementById('filter-dropdown-status').value : 'all';
-                const fSearch = document.getElementById('filter-search-bar') ? document.getElementById('filter-search-bar').value.trim().toLowerCase() : '';
+                const warningPrompt = `⚠️ ADMINISTRATIVE CONFIRMATION DETECTED ⚠️\n\nAre you absolutely sure you want to permanently delete the following match fixture:\n"${t1} vs ${t2} [Court: ${targetMatch.court}]"?\n\nThis will completely purge historical scores and immediately rewrite ladder standings. This action cannot be undone!`;
 
-                if(fTeam !== 'all') {
-                    filteredList = filteredList.filter(m => m.team1Id === fTeam || m.team2Id === fTeam);
+                if (confirm(warningPrompt)) {
+                    set(ref(database, 'matches/' + matchId), null).then(() => {
+                        alert("Match item purged successfully from dynamic environment context.");
+                        document.getElementById('admin-score-match-select').value = "";
+                        document.getElementById('admin-score-t1').value = "";
+                        document.getElementById('admin-score-t2').value = "";
+                        this.initDashboardDataPipeline();
+                    }).catch(err => alert("Cloud purging communication failure: " + err.message));
                 }
-                if(fLoc !== 'all') {
-                    filteredList = filteredList.filter(m => m.courtLocation === fLoc);
+            },
+            
+            setMatchFilter: function(filterType) {
+                this.matchFilter = filterType;
+                document.getElementById('filter-pill-all').classList.remove('active');
+                document.getElementById('filter-pill-mine').classList.remove('active');
+                
+                if(filterType === 'all') document.getElementById('filter-pill-all').classList.add('active');
+                if(filterType === 'mine') document.getElementById('filter-pill-mine').classList.add('active');
+                
+                this.renderMatchesContainer();
+            },
+            
+            renderMatchesContainer: function() {
+                const root = document.getElementById('matches-list-root');
+                if(!root) return;
+                root.innerHTML = "";
+                
+                let fMatches = globalState.matches.filter(m => m.tournamentCode === router.activeTournamentCode);
+                
+                if(router.currentRole === 'player' && this.matchFilter === 'mine') {
+                    fMatches = fMatches.filter(m => m.team1Id === router.activePlayerTeamId || m.team2Id === router.activePlayerTeamId);
                 }
-                if(fStatus !== 'all') {
-                    filteredList = filteredList.filter(m => m.matchStatusValue === fStatus);
-                }
-                if(fSearch !== '') {
-                    filteredList = filteredList.filter(m => {
-                        const t1N = this.getTeamNameById(m.team1Id).toLowerCase();
-                        const t2N = this.getTeamNameById(m.team2Id).toLowerCase();
-                        const mCustom = m.customMatchName ? m.customMatchName.toLowerCase() : '';
-                        const mSerial = m.generatedSerialName.toLowerCase();
-                        const mCourt = m.courtLocation ? m.courtLocation.toLowerCase() : '';
-                        return t1N.includes(fSearch) || t2N.includes(fSearch) || mCustom.includes(fSearch) || mSerial.includes(fSearch) || mCourt.includes(fSearch);
-                    });
-                }
-
-                if(filteredList.length === 0) {
-                    root.innerHTML = '<p style="text-align:center; font-size:0.9rem; padding:20px; color:var(--text-secondary);">No match configurations fulfill current filtering thresholds.</p>';
+                
+                if(fMatches.length === 0) {
+                    root.innerHTML = "<div style='text-align:center; padding:30px; color:var(--text-secondary); font-size:0.9rem;'>No active game records parsed matching lookup criteria.</div>";
                     return;
                 }
-
-                filteredList.forEach(m => {
-                    const card = document.createElement('div');
+                
+                const teamsMap = {};
+                globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode).forEach(t => {
+                    teamsMap[t.id] = t.name;
+                });
+                
+                for(let i = fMatches.length - 1; i >= 0; i--) {
+                    let m = fMatches[i];
+                    let card = document.createElement('div');
+                    card.className = 'match-card';
                     
-                    // Priority Visual Treatment style injection
-                    const isPriority = m.matchStatusValue === 'about-to-play';
-                    card.className = `match-card ${isPriority ? 'priority-match' : ''}`;
+                    let isT1Winner = m.status === 'completed' && m.team1Score > m.team2Score;
+                    let isT2Winner = m.status === 'completed' && m.team2Score > m.team1Score;
                     
-                    const t1Name = this.getTeamNameById(m.team1Id);
-                    const t2Name = this.getTeamNameById(m.team2Id);
-                    
-                    // Determine Match Outcome Class Contexts (Wins vs Losses vs Ties)
-                    let t1Class = '', t2Class = '';
-                    let matchStatusDisplayString = m.matchStatusValue ? m.matchStatusValue.replace(/-/g, ' ') : 'scheduled';
-                    
-                    if(m.isCompleted) {
-                        if(m.team1Score > m.team2Score) {
-                            t1Class = 'winner';
-                        } else if(m.team2Score > m.team1Score) {
-                            t2Class = 'winner';
-                        } else {
-                            t1Class = 'tied';
-                            t2Class = 'tied';
-                        }
-                        matchStatusDisplayString = 'completed';
+                    let highlightBorderCSS = "";
+                    if(router.currentRole === 'player' && (m.team1Id === router.activePlayerTeamId || m.team2Id === router.activePlayerTeamId)) {
+                        highlightBorderCSS = "border-left: 4px solid var(--primary-blue);";
                     }
-
-                    const titleHeaderLabel = m.customMatchName ? m.customMatchName : m.generatedSerialName;
-
+                    if(highlightBorderCSS) card.setAttribute('style', highlightBorderCSS);
+                    
                     card.innerHTML = `
                         <div class="match-header">
-                            <div class="match-court">📍 ${m.courtLocation} &nbsp;|&nbsp; <strong>${titleHeaderLabel}</strong></div>
-                            <div class="match-status ${m.matchStatusValue}">${matchStatusDisplayString}</div>
+                            <div class="match-court">📍 ${m.court}</div>
+                            <div class="match-status ${m.status}">${m.status}</div>
                         </div>
                         <div class="match-body-table">
-                            <div class="match-team-row ${t1Class}">
-                                <div class="match-team-name">${t1Name} ${router.playerAssignedTeamId === m.team1Id ? '⭐️' : ''}</div>
-                                <div class="match-team-score">${m.isCompleted ? m.team1Score : '-'}</div>
+                            <div class="match-team-row ${isT1Winner ? 'winner' : ''}">
+                                <div class="match-team-name">${teamsMap[m.team1Id] || 'Unknown Team'} ${m.team1Id === router.activePlayerTeamId ? '<strong>(You)</strong>' : ''}</div>
+                                <div class="match-team-score">${m.status === 'completed' ? m.team1Score : '-'}</div>
                             </div>
-                            <div class="match-team-row ${t2Class}">
-                                <div class="match-team-name">${t2Name} ${router.playerAssignedTeamId === m.team2Id ? '⭐️' : ''}</div>
-                                <div class="match-team-score">${m.isCompleted ? m.team2Score : '-'}</div>
+                            <div class="match-team-row ${isT2Winner ? 'winner' : ''}">
+                                <div class="match-team-name">${teamsMap[m.team2Id] || 'Unknown Team'} ${m.team2Id === router.activePlayerTeamId ? '<strong>(You)</strong>' : ''}</div>
+                                <div class="match-team-score">${m.status === 'completed' ? m.team2Score : '-'}</div>
                             </div>
                         </div>
                     `;
                     root.appendChild(card);
-                });
+                }
             },
-
+            
             renderLeaderboardLadder: function() {
                 const root = document.getElementById('scoreboard-table-root');
-                root.innerHTML = '';
-
-                const currentTournamentTeams = globalState.teams.filter(t => t.tournamentRefCode === router.activeTournamentCode);
-                const currentTournamentMatches = globalState.matches.filter(m => m.tournamentRefCode === router.activeTournamentCode && m.isCompleted);
-
-                // Build mapping dictionaries initializing arrays structures supporting exact ties data elements
-                let statsMap = {};
-                currentTournamentTeams.forEach(t => {
-                    statsMap[t.teamId] = {
-                        id: t.teamId,
-                        name: t.teamNameText,
-                        wins: 0,
-                        losses: 0,
-                        ties: 0,
-                        pointsScored: 0,
-                        pointsAllowed: 0
-                    };
+                if(!root) return;
+                root.innerHTML = "";
+                
+                const allTeams = globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode);
+                const allMatches = globalState.matches.filter(m => m.tournamentCode === router.activeTournamentCode && m.status === 'completed');
+                
+                const stats = {};
+                allTeams.forEach(t => {
+                    stats[t.id] = { id: t.id, name: t.name, wins: 0, losses: 0, pointsScored: 0, pointsAllowed: 0, totalGames: 0 };
                 });
-
-                currentTournamentMatches.forEach(m => {
-                    const t1 = statsMap[m.team1Id];
-                    const t2 = statsMap[m.team2Id];
-
-                    if(t1 && t2) {
-                        t1.pointsScored += m.team1Score;
-                        t1.pointsAllowed += m.team2Score;
-                        t2.pointsScored += m.team2Score;
-                        t2.pointsAllowed += m.team1Score;
-
+                
+                allMatches.forEach(m => {
+                    if(stats[m.team1Id] && stats[m.team2Id]) {
+                        stats[m.team1Id].pointsScored += m.team1Score;
+                        stats[m.team1Id].pointsAllowed += m.team2Score;
+                        stats[m.team1Id].totalGames += 1;
+                        
+                        stats[m.team2Id].pointsScored += m.team2Score;
+                        stats[m.team2Id].pointsAllowed += m.team1Score;
+                        stats[m.team2Id].totalGames += 1;
+                        
                         if(m.team1Score > m.team2Score) {
-                            t1.wins++;
-                            t2.losses++;
-                        } else if(m.team2Score > m.team1Score) {
-                            t2.wins++;
-                            t1.losses++;
+                            stats[m.team1Id].wins += 1;
+                            stats[m.team2Id].losses += 1;
                         } else {
-                            // Support Ties Feature Logic Assignment
-                            t1.ties++;
-                            t2.ties++;
+                            stats[m.team2Id].wins += 1;
+                            stats[m.team1Id].losses += 1;
                         }
                     }
                 });
-
-                let leaderboardArray = Object.values(statsMap);
                 
-                // Sorting Matrix: Win Ratio Ratio / Points Differential Optimization
-                leaderboardArray.sort((a, b) => {
-                    const aPoints = (a.wins * 3) + (a.ties * 1);
-                    const bPoints = (b.wins * 3) + (b.ties * 1);
-                    if(bPoints !== aPoints) return bPoints - aPoints;
+                let sortedList = Object.values(stats);
+                
+                sortedList.sort((a, b) => {
+                    let winRatioA = a.totalGames > 0 ? (a.wins / a.totalGames) : 0;
+                    let winRatioB = b.totalGames > 0 ? (b.wins / b.totalGames) : 0;
                     
-                    const aDiff = a.pointsScored - a.pointsAllowed;
-                    const bDiff = b.pointsScored - b.pointsAllowed;
-                    return bDiff - aDiff;
+                    if(winRatioB !== winRatioA) return winRatioB - winRatioA;
+                    
+                    let diffA = a.pointsScored - a.pointsAllowed;
+                    let diffB = b.pointsScored - b.pointsAllowed;
+                    if(diffB !== diffA) return diffB - diffA;
+                    
+                    return b.pointsScored - a.pointsScored;
                 });
-
-                // Render Table Elements with exact W-L-T logs tracking blocks
-                root.innerHTML = `
-                    <div class="standing-row header-row">
-                        <div class="standing-cell">Team Designation Roster</div>
-                        <div class="standing-cell center">W-L-T</div>
-                        <div class="standing-cell right">Diff</div>
-                        <div class="standing-cell right">PF</div>
-                    </div>
+                
+                let header = document.createElement('div');
+                header.className = 'standing-row header-row';
+                header.innerHTML = `
+                    <div class="standing-cell">Rank / Team</div>
+                    <div class="standing-cell center">W-L</div>
+                    <div class="standing-cell right">Diff</div>
+                    <div class="standing-cell right">PF</div>
                 `;
-
-                leaderboardArray.forEach((stat, index) => {
-                    const row = document.createElement('div');
+                root.appendChild(header);
+                
+                sortedList.forEach((stat, index) => {
+                    let row = document.createElement('div');
                     row.className = 'standing-row';
-                    
-                    if(router.playerAssignedTeamId === stat.id) {
+                    if(router.currentRole === 'player' && stat.id === router.activePlayerTeamId) {
                         row.classList.add('highlighted-team');
                     }
                     
@@ -1770,94 +1630,12 @@
                     
                     row.innerHTML = `
                         <div class="standing-cell"><strong>#${index + 1}</strong> &nbsp;${stat.name}</div>
-                        <div class="standing-cell center">${stat.wins}-${stat.losses}-${stat.ties}</div>
+                        <div class="standing-cell center">${stat.wins}-${stat.losses}</div>
                         <div class="standing-cell right">${signedDiff}</div>
                         <div class="standing-cell right">${stat.pointsScored}</div>
                     `;
                     root.appendChild(row);
                 });
-            },
-
-            // TOURNAMENT LIVE UPDATE INFO: Commits the edited metadata field modifications back to Cloud DB
-            executeSaveTournamentMeta: function() {
-                const name = document.getElementById('edit-tourn-name').value.trim();
-                const date = document.getElementById('edit-tourn-date').value;
-                const code = document.getElementById('edit-tourn-code').value.trim().toUpperCase();
-                const secret = document.getElementById('edit-tourn-secret').value.trim();
-
-                if(!name || !date || !code || !secret) {
-                    return alert("All field inputs must remain populated.");
-                }
-
-                const oldCode = router.activeTournamentCode;
-
-                if(oldCode !== code && globalState.tournaments[code]) {
-                    return alert("The target Event Code destination is already occupied by another profile context instance.");
-                }
-
-                const currentTournament = globalState.tournaments[oldCode];
-                
-                const updatedObj = {
-                    ...currentTournament,
-                    uidCode: code,
-                    displayName: name,
-                    calendarDate: date,
-                    adminSecretKey: secret
-                };
-
-                // Perform structural data transaction migration if the unique node key was changed
-                if(oldCode !== code) {
-                    if(!confirm("Changing the event code requires re-routing historical matches and items. Proceed?")) return;
-                    
-                    // Save new block reference instance node tracking
-                    set(ref(database, `tournaments/${code}`), updatedObj).then(() => {
-                        // Purge outdated index tracking trace markers
-                        set(ref(database, `tournaments/${oldCode}`), null);
-                        
-                        // Migrate relative dependency loops context mappings
-                        globalState.teams.filter(t => t.tournamentRefCode === oldCode).forEach(t => {
-                            update(ref(database, `teams/${t.teamId}`), { tournamentRefCode: code });
-                        });
-                        globalState.matches.filter(m => m.tournamentRefCode === oldCode).forEach(m => {
-                            update(ref(database, `matches/${m.matchId}`), { tournamentRefCode: code });
-                        });
-
-                        router.activeTournamentCode = code;
-                        document.getElementById('activeTournamentBadge').innerText = "ID: " + code;
-                        alert("Tournament profile records successfully migrated!");
-                        router.showPanel('view-dashboard');
-                    });
-                } else {
-                    set(ref(database, `tournaments/${oldCode}`), updatedObj).then(() => {
-                        alert("Tournament information modified successfully.");
-                        router.showPanel('view-dashboard');
-                    });
-                }
-            },
-
-            syncTournamentMetaHeaderDisplay: function() {
-                const header = document.getElementById('globalTournamentMetaHeader');
-                if(!router.activeTournamentCode) {
-                    header.classList.add('hidden');
-                    return;
-                }
-
-                const tourney = globalState.tournaments[router.activeTournamentCode];
-                if(tourney) {
-                    document.getElementById('metaHeaderTitle').innerText = tourney.displayName;
-                    document.getElementById('metaHeaderSub').innerText = `Organized by Admin Context: ${tourney.ownerAdminRef} • Scheduled Date: ${tourney.calendarDate}`;
-                    header.classList.remove('hidden');
-                }
-            },
-
-            checkRosterNavigationEligibility: function() {
-                this.initRosterCreationWorkspace();
-            },
-
-            getTeamNameById: function(teamId) {
-                if(!teamId) return 'Undefined Node';
-                const team = globalState.teams.find(t => t.teamId === teamId);
-                return team ? team.teamNameText : 'Unknown Team Entity';
             }
         };
 
@@ -1877,37 +1655,81 @@
                 }
             },
 
-            toggleProfileDropdown: function(e) {
-                e.stopPropagation();
-                document.getElementById('adminProfileDropdown').classList.toggle('hidden');
+            toggleProfileDropdown: function(event) {
+                event.stopPropagation();
+                const dropdown = document.getElementById('adminProfileDropdown');
+                dropdown.classList.toggle('hidden');
             },
 
             promptChangeUsername: function() {
-                const newU = prompt("Input your updated admin profile identifier username:");
-                if(!newU) return;
-                alert("Account username mapping context tracking refreshed!");
+                if (!sessionAdminUser) return;
+                const current = sessionAdminUser;
+                const newUser = prompt("Input fresh replacement identity string moniker:", current);
+                if (!newUser) return;
+                const cleanNewUser = newUser.trim();
+                
+                if (!cleanNewUser || cleanNewUser === current) return;
+                if(cleanNewUser.includes('.') || cleanNewUser.includes('#') || cleanNewUser.includes('$') || cleanNewUser.includes('[') || cleanNewUser.includes(']')) {
+                    alert('Format violation: Special path characters are strictly prohibited.');
+                    return;
+                }
+
+                get(child(ref(database), 'admins/' + cleanNewUser)).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        alert("Modification Aborted: Target replacement name is already claimed.");
+                    } else {
+                        const targetPassword = globalState.admins[current].password;
+                        let updates = {};
+                        
+                        // Copy to new key profile
+                        updates['admins/' + cleanNewUser] = { username: cleanNewUser, password: targetPassword };
+                        // Delete old profile node
+                        updates['admins/' + current] = null;
+
+                        // Re-route creator associations to preserve ownership metrics smoothly
+                        Object.values(globalState.tournaments).forEach(t => {
+                            if (t.creator === current) {
+                                updates[`tournaments/${t.code}/creator`] = cleanNewUser;
+                                updates[`tournaments/${t.code}/adminName`] = cleanNewUser;
+                            }
+                        });
+
+                        update(ref(database), updates).then(() => {
+                            alert("Username database keys synchronized successfully.");
+                            sessionAdminUser = cleanNewUser;
+                            document.getElementById('adminUserMenuBtn').innerText = "Account: " + cleanNewUser;
+                            router.exitActiveTournamentToWorkspace();
+                        });
+                    }
+                });
             },
 
             promptChangePassword: function() {
-                const newP = prompt("Establish your newly selected account password string below:");
-                if(!newP) return;
-                alert("Security password structure modification verified locally!");
+                if (!sessionAdminUser) return;
+                const currentPass = globalState.admins[sessionAdminUser].password;
+                const promptVal = prompt("Enter completely fresh account validation credentials:");
+                if (!promptVal) return;
+                const cleanPass = promptVal.trim();
+                
+                if (!cleanPass || cleanPass === currentPass) return;
+
+                set(ref(database, `admins/${sessionAdminUser}/password`), cleanPass).then(() => {
+                    alert("Account security credentials successfully altered in Firebase infrastructure.");
+                });
             },
 
             promptDeleteAccount: function() {
-                if(confirm("DANGER: Terminating this admin account cannot be reverted. Confirm deletion?")) {
-                    set(ref(database, `admins/${sessionAdminUser}`), null).then(() => {
+                if (!sessionAdminUser) return;
+                const verification = confirm("⚠️ IMMEDIATE DESTRUCTIVE ALERT ⚠️\n\nAre you absolutely positive you want to completely erase your master admin profile registration file?\n\nYou will instantly lose configuration bypass access channels to all linked events.");
+                
+                if (verification) {
+                    set(ref(database, 'admins/' + sessionAdminUser), null).then(() => {
+                        alert("Administrative operational profile securely deleted.");
                         auth.logout();
                     });
                 }
             }
         };
-
-        // Close dropdown components dynamically on outer window backdrop click events
-        window.addEventListener('click', () => {
-            const drop = document.getElementById('adminProfileDropdown');
-            if(drop) drop.classList.add('hidden');
-        });
 
         // Self-start application frame layer on boot
         router.toLogin();
