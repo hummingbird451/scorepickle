@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScorePickle - Tournament Tracker</title>
+    <style>
+        /* FRC Team 4414 Inspired Design Tokens & Theme Variables */
+        :root {
+            --bg-color: #0b0f19;
+            --surface-color: #161f30;
+            --surface-accent: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --primary-blue: #2563eb;
+            --primary-hover: #3b82f6;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --border-color: #2d3748;
+            --highlight-bg: rgba(37, 99, 235, 0.15);
+            --highlight-border: #3b82f6;
+            --input-bg: #0f172a;
+        }
+
+        .light-mode {
+            --bg-color: #f8fafc;
+            --surface-color: #ffffff;
+            --surface-accent: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --primary-blue: #1d4ed8;
+            --primary-hover: #2563eb;
+            --accent-green: #15803d;
+            --accent-red: #b91c1c;
+            --border-color: #cbd5e1;
+            --highlight-bg: rgba(29, 78, 216, 0.1);
+            --highlight-border: #1d4ed8;
+            --input-bg: #f8fafc;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            padding: 20px 15px;
+            display: block;
+        }
+
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Global Header Utility Component */
+        .global-header {
+            display: block;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 15px;
+        }
+
+        .header-top {
+            display: table;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .brand-title {
+            display: table-cell;
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+
+        .brand-title span {
+            color: var(--primary-blue);
+        }
+
+        .utility-controls {
+            display: table-cell;
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        .mode-toggle {
+            background: var(--surface-accent);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Profile Dropdown Drawer Interface Layout */
+        .admin-profile-container {
+            display: inline-block;
+            position: relative;
+            margin-right: 10px;
+            vertical-align: middle;
+            text-align: left;
+        }
+
+        .admin-profile-trigger {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .admin-profile-trigger:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .admin-dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            width: 220px;
+            padding: 5px 0;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--surface-accent);
+        }
+
+        .dropdown-item.danger-action {
+            color: var(--accent-red);
+        }
+
+        .dropdown-item.danger-action:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .role-badge {
+            display: inline-block;
+            background-color: var(--surface-accent);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 5px;
+            margin-right: 5px;
+        }
+
+        /* Context Header Display Panel styling */
+        .tournament-meta-display {
+            background: linear-gradient(135deg, var(--surface-accent), var(--surface-color));
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 15px;
+        }
+
+        .meta-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #ffffff;
+        }
+        .light-mode .meta-title {
+            color: var(--text-primary);
+        }
+
+        .meta-subtext {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        /* Layout Framework Views */
+        .view-panel {
+            display: block;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Cards & Grouping Elements */
+        .card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        /* Forms, Buttons, & Dynamic Input Components */
+        .form-group {
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        .input-field {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: var(--primary-blue);
+        }
+
+        .btn {
+            width: 100%;
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-accent);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+
+        .btn-danger {
+            background-color: transparent;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+            width: auto;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--accent-red);
+            color: #ffffff;
+        }
+
+        .divider-text {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.05em;
+        }
+
+        /* Dynamic Row Form Assembly Layout */
+        .dynamic-row-container {
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .dynamic-input-row {
+            display: table;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .row-cell-input {
+            display: table-cell;
+            width: 80%;
+            padding-right: 10px;
+        }
+
+        .row-cell-action {
+            display: table-cell;
+            width: 20%;
+            vertical-align: middle;
+            text-align: right;
+        }
+
+        /* Navigation Tabs Control Component */
+        .nav-tabs {
+            display: table;
+            width: 100%;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tab-item {
+            display: table-cell;
+            text-align: center;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-item.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+            background-color: var(--surface-accent);
+        }
+
+        .sub-filters {
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        .filter-pill {
+            display: inline-block;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border-radius: 20px;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            margin-right: 8px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .filter-pill.active {
+            background-color: var(--primary-blue);
+            color: #ffffff;
+            border-color: var(--primary-blue);
+        }
+
+        /* Advanced Filter Controls Bar Styling */
+        .advanced-filters-bar {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .filter-grid-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-grid-row .input-field {
+            padding: 8px;
+            font-size: 0.85rem;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        /* Content Lists & Structural Display Layouts */
+        .match-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+        }
+
+        .match-header {
+            display: table;
+            width: 100%;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 4px;
+        }
+
+        .match-court {
+            display: table-cell;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .match-status {
+            display: table-cell;
+            text-align: right;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .match-status.completed {
+            color: var(--accent-green);
+        }
+
+        .match-status.pending {
+            color: #eab308;
+        }
+
+        .match-status.about_to_play {
+            color: #ff781e;
+            animation: pulse-glow 1.5s infinite;
+        }
+
+        @keyframes pulse-glow {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        .match-body-table {
+            display: table;
+            width: 100%;
+        }
+
+        .match-team-row {
+            display: table-row;
+        }
+
+        .match-team-name {
+            display: table-cell;
+            font-size: 1.05rem;
+            font-weight: 600;
+            padding: 4px 0;
+        }
+
+        .match-team-score {
+            display: table-cell;
+            text-align: right;
+            font-size: 1.2rem;
+            font-weight: 800;
+            padding: 4px 0;
+            width: 50px;
+        }
+
+        .match-team-row.winner .match-team-name {
+            color: #ffffff;
+        }
+        .light-mode .match-team-row.winner .match-team-name {
+            color: var(--text-primary);
+        }
+
+        .match-team-row.winner .match-team-score {
+            color: var(--accent-green);
+        }
+
+        /* Leaderboard Standing Ladder Display Component */
+        .standing-table {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .standing-row {
+            display: table-row;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .standing-row.header-row {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .standing-cell {
+            display: table-cell;
+            padding: 12px 6px;
+            vertical-align: middle;
+            font-size: 0.9rem;
+        }
+
+        .standing-cell.center {
+            text-align: center;
+        }
+
+        .standing-cell.right {
+            text-align: right;
+        }
+
+        .standing-row.highlighted-team {
+            background-color: var(--highlight-bg);
+            border-left: 4px solid var(--highlight-border);
+            border-right: 1px solid var(--highlight-border);
+        }
+
+        .standing-row.highlighted-team .standing-cell {
+            font-weight: 700;
+        }
+
+        /* Floating Interactive Selection Overlay */
+        .admin-action-bar {
+            margin-top: 15px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 15px;
+        }
+
+        /* Tournament List Item Grid Component Layout */
+        .admin-tournaments-list {
+            margin-top: 15px;
+        }
+
+        .tournament-list-card {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: table;
+            width: 100%;
+        }
+
+        .tourn-card-info {
+            display: table-cell;
+            width: 80%;
+            vertical-align: middle;
+        }
+
+        .tourn-card-actions {
+            display: table-cell;
+            width: 20%;
+            vertical-align: middle;
+            text-align: right;
+        }
+
+        .tourn-card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ffffff;
+            cursor: pointer;
+        }
+        .light-mode .tourn-card-title {
+            color: var(--text-primary);
+        }
+
+        .tourn-card-title:hover {
+            color: var(--primary-blue);
+            text-decoration: underline;
+        }
+
+        .tourn-card-meta {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            line-height: 1.35;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <header class="global-header">
+            <div class="header-top">
+                <div class="brand-title" onclick="router.handleHeaderBrandClick()">Score<span>Pickle</span></div>
+                <div class="utility-controls">
+                    <div id="adminProfileWrapper" class="admin-profile-container hidden">
+                        <button class="admin-profile-trigger" id="adminUserMenuBtn" onclick="ui.toggleProfileDropdown(event)">Profile: Account</button>
+                        <div id="adminProfileDropdown" class="admin-dropdown-menu hidden">
+                            <div class="dropdown-item" onclick="router.exitActiveTournamentToWorkspace()">← Tournaments Screen</div>
+                            <div class="dropdown-item" onclick="ui.promptChangeUsername()">Modify Account Username</div>
+                            <div class="dropdown-item" onclick="ui.promptChangePassword()">Modify Account Password</div>
+                            <div class="dropdown-item" onclick="auth.logout()">Sign Out of Account</div>
+                            <div class="dropdown-item danger-action" onclick="ui.promptDeleteAccount()">⚠️ Terminate Admin Account</div>
+                        </div>
+                    </div>
+                    <button class="mode-toggle" id="modeToggleBtn" onclick="ui.toggleTheme()">☀️ Light</button>
+                </div>
+            </div>
+            <div id="activeTournamentBadge" class="role-badge hidden">Tourney: Void</div>
+            <div id="userRoleBadge" class="role-badge hidden">Role: Public</div>
+        </header>
+
+        <div id="globalTournamentMetaHeader" class="tournament-meta-display hidden">
+            <div id="metaHeaderTitle" class="meta-title">Tournament Name</div>
+            <div id="metaHeaderSub" class="meta-subtext">Organized by Creator Name • Date</div>
+            <div id="adminEditTournButtonWrapper" class="hidden" style="margin-top: 8px;">
+                <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem; width: auto; margin-bottom: 0;" onclick="ui.showEditTournamentModal()">⚙️ Edit Tournament Info</button>
+            </div>
+        </div>
+
+        <main id="view-edit-tournament" class="view-panel hidden">
+            <div class="card">
+                <h2>Modify Tournament Information</h2>
+                <div class="form-group">
+                    <label>Tournament Nickname</label>
+                    <input type="text" id="edit-tourn-name" class="input-field">
+                </div>
+                <div class="form-group">
+                    <label>Scheduled Event Date</label>
+                    <input type="date" id="edit-tourn-date" class="input-field">
+                </div>
+                <div class="form-group">
+                    <label>Tournament Code (Changing this re-maps all dynamic records)</label>
+                    <input type="text" id="edit-tourn-code" class="input-field" style="text-transform: uppercase;">
+                </div>
+                <div class="form-group">
+                    <label>Admin Validation Access Code Key</label>
+                    <input type="text" id="edit-tourn-secret" class="input-field">
+                </div>
+                <button class="btn" style="background-color: var(--accent-green);" onclick="app.executeSaveTournamentEdit()">Apply Structure Changes</button>
+                <button class="btn btn-secondary" onclick="router.switchTab('matches'); router.go('view-dashboard');">Cancel & Discard</button>
+            </div>
+        </main>
+
+        <main id="view-login" class="view-panel">
+            <div class="card">
+                <h2>Welcome to ScorePickle</h2>
+                <p style="margin-bottom: 20px; font-size: 0.9rem;">Track real-time scores and tournament standings for high school pickleball clubs.</p>
+                
+                <button class="btn" onclick="router.setRole('audience')">Enter as Audience</button>
+                <button class="btn btn-secondary" onclick="router.setRole('player')">Enter as Player</button>
+                
+                <div class="divider-text">Tournament Administrator Access</div>
+                
+                <div class="form-group">
+                    <label>Admin Username</label>
+                    <input type="text" id="login-user" class="input-field" placeholder="e.g., coach4414">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-pass" class="input-field" placeholder="••••••••">
+                </div>
+                
+                <div style="display: table; width: 100%; margin-top: 10px;">
+                    <div style="display: table-cell; width: 49%; padding-right: 5px;">
+                        <button class="btn" style="background-color: var(--primary-blue);" onclick="auth.login()">Sign In Account</button>
+                    </div>
+                    <div style="display: table-cell; width: 49%; padding-left: 5px;">
+                        <button class="btn" style="background-color: var(--accent-green);" onclick="auth.register()">Register New Admin</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <main id="view-enter-code" class="view-panel hidden">
+            <div class="card">
+                <h2 id="portal-title">Enter Tournament Portal</h2>
+                
+                <div class="form-group">
+                    <label>Tournament Code (Non Case-Sensitive)</label>
+                    <input type="text" id="portal-code-input" class="input-field" placeholder="ex: AWPB4" style="text-transform: uppercase;" oninput="app.handlePortalCodeInput(this.value)">
+                </div>
+
+                <div id="player-identity-box" class="form-group hidden">
+                    <label>Select Your Team Identity</label>
+                    <select id="player-team-select" class="input-field">
+                        <option value="">-- Enter a valid code above first --</option>
+                    </select>
+                </div>
+
+                <div id="admin-auth-box" class="form-group hidden">
+                    <div class="divider-text">Authorization Validation</div>
+                    <label>Admin Access Code</label>
+                    <input type="password" id="portal-admin-code" class="input-field" placeholder="Enter tournament admin key">
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn" onclick="router.submitPortalCode()">Confirm & Enter</button>
+                    <button class="btn btn-secondary" onclick="router.toLogin()">← Back to Login Gates</button>
+                </div>
+            </div>
+        </main>
+
+        <main id="view-create-tournament" class="view-panel hidden">
+            <div class="card">
+                <h2>Initialize Tournament Configuration</h2>
+                <div class="form-group">
+                    <label>Tournament Nickname</label>
+                    <input type="text" id="create-tourn-name" class="input-field" placeholder="e.g., Spring Smash 2026">
+                </div>
+                <div class="form-group">
+                    <label>Scheduled Event Date</label>
+                    <input type="date" id="create-tourn-date" class="input-field">
+                </div>
+                <div class="form-group">
+                    <label>Custom Tournament Code</label>
+                    <input type="text" id="create-tourn-code" class="input-field" placeholder="e.g., AWPB4" style="text-transform: uppercase;">
+                </div>
+                <div class="form-group">
+                    <label>Admin Validation Code (For entering from public consoles)</label>
+                    <input type="text" id="create-tourn-secret" class="input-field" placeholder="e.g., 4414SECRET">
+                </div>
+                
+                <button class="btn" style="background-color: var(--accent-green);" onclick="app.executeCreateTournament()">Commit & Launch Instance</button>
+                <button class="btn btn-secondary" onclick="router.toLogin()">Logout/Disconnect Session</button>
+            </div>
+
+            <div class="card">
+                <h2>Your Owned Event Tournaments</h2>
+                <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 10px;">Select a title link to instantly bypass auth gate locks.</p>
+                <div class="admin-tournaments-list" id="ownedTournamentsRoot"></div>
+            </div>
+        </main>
+
+        <main id="view-teams-management" class="view-panel hidden">
+            <div class="card">
+                <div style="display: table; width: 100%; margin-bottom: 15px;">
+                    <h2 style="display: table-cell; margin-bottom: 0;">Roster Generation Hub</h2>
+                    <span id="team-counter-badge" style="display: table-cell; text-align: right; font-weight: bold; color: var(--primary-blue);">Total Teams: 0</span>
+                </div>
+                
+                <p style="font-size: 0.85rem; margin-bottom: 15px;">Input team designations. Tapping Enter or clicking the plus layout box auto-appends sequential rows securely.</p>
+                
+                <div id="dynamic-team-rows-root" class="dynamic-row-container"></div>
+
+                <button class="btn" style="background-color: var(--primary-blue);" onclick="app.addNewTeamInputRow()">+ Add Team Row</button>
+                <button class="btn" style="background-color: var(--accent-green); margin-top: 10px;" onclick="app.submitTeamRoster()">Save & Commit Roster</button>
+            </div>
+        </main>
+
+        <main id="view-dashboard" class="view-panel hidden">
+            
+            <nav class="nav-tabs">
+                <div id="tab-link-matches" class="tab-item active" onclick="router.switchTab('matches')">Matches View</div>
+                <div id="tab-link-scoreboard" class="tab-item" onclick="router.switchTab('scoreboard')">Scoreboard Ladder</div>
+            </nav>
+
+            <div id="tab-content-matches" class="tab-pane">
+                
+                <div id="player-filter-controls" class="sub-filters hidden">
+                    <div id="filter-pill-all" class="filter-pill active" onclick="app.setMatchFilter('all')">Global Fixtures</div>
+                    <div id="filter-pill-mine" class="filter-pill" onclick="app.setMatchFilter('mine')">My Matches</div>
+                </div>
+
+                <div class="advanced-filters-bar">
+                    <div style="font-size: 0.8rem; font-weight: bold; margin-bottom: 6px; color: var(--text-secondary);">Filter and Search Fixtures:</div>
+                    <div class="filter-grid-row">
+                        <input type="text" id="search-filter-input" class="input-field" placeholder="🔍 Search match/team name..." oninput="app.renderMatchesContainer()">
+                        <select id="team-filter-dropdown" class="input-field" onchange="app.renderMatchesContainer()">
+                            <option value="">All Teams</option>
+                        </select>
+                    </div>
+                    <div class="filter-grid-row">
+                        <select id="location-filter-dropdown" class="input-field" onchange="app.renderMatchesContainer()">
+                            <option value="">All Locations/Courts</option>
+                        </select>
+                        <select id="status-filter-dropdown" class="input-field" onchange="app.renderMatchesContainer()">
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="about_to_play">About To Play</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="admin-match-actions-card" class="card hidden" style="border-color: var(--primary-blue); background-color: var(--input-bg);">
+                    <h3 id="admin-panel-mode-title">Admin Management Dashboard: Create</h3>
+                    
+                    <div class="admin-action-bar" id="admin-creation-block" style="border-top: none; padding-top: 0;">
+                        <div class="form-group">
+                            <label>Custom Match Name (Optional)</label>
+                            <input type="text" id="match-create-name" class="input-field" placeholder="e.g., Round 1 Core Match (Auto if blank)">
+                        </div>
+                        <div class="dynamic-input-row">
+                            <div class="row-cell-input" style="width: 35%; padding-right: 5px;">
+                                <select id="match-create-t1" class="input-field" style="padding: 8px; font-size:0.85rem;"></select>
+                            </div>
+                            <div class="row-cell-input" style="width: 5%; text-align: center; color: var(--text-secondary); padding-right: 5px; vertical-align: middle; font-weight: bold;">VS</div>
+                            <div class="row-cell-input" style="width: 35%; padding-right: 5px;">
+                                <select id="match-create-t2" class="input-field" style="padding: 8px; font-size:0.85rem;"></select>
+                            </div>
+                            <div class="row-cell-input" style="width: 25%;">
+                                <input type="text" id="match-create-court" class="input-field" placeholder="Court #" style="padding: 8px; font-size:0.85rem;">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin-top: 5px;">
+                            <label>Initial Match Status Orientation</label>
+                            <select id="match-create-status" class="input-field" style="padding: 8px; font-size:0.85rem;">
+                                <option value="pending">Pending (Standard)</option>
+                                <option value="about_to_play">🔥 About To Play (Prioritize To Top)</option>
+                            </select>
+                        </div>
+                        <button class="btn" style="padding: 8px; font-size: 0.85rem; background-color: var(--primary-blue); margin-bottom: 5px;" onclick="app.executeCreateMatch()">Submit Pair Match</button>
+                    </div>
+
+                    <div class="admin-action-bar">
+                        <label style="font-size: 0.8rem; font-weight: bold; display:block; margin-bottom: 5px;">Modify parameters, status values, and score matrices:</label>
+                        <div class="form-group">
+                            <select id="admin-score-match-select" class="input-field" style="padding: 8px; font-size: 0.85rem;" onchange="app.syncScoreFieldsWithSelectedMatch()"></select>
+                        </div>
+                        
+                        <div id="admin-edit-sandbox-fields" class="hidden" style="background-color: var(--surface-accent); padding: 10px; border-radius: 6px; margin-bottom: 12px; border: 1px dashed var(--border-color);">
+                            <div class="form-group">
+                                <label>Edit Structural Custom Match Name</label>
+                                <input type="text" id="admin-edit-match-name" class="input-field" style="padding: 6px; font-size: 0.85rem;">
+                            </div>
+                            <div class="form-group">
+                                <label>Edit Court Location Info</label>
+                                <input type="text" id="admin-edit-match-court" class="input-field" style="padding: 6px; font-size: 0.85rem;">
+                            </div>
+                            <div class="form-group">
+                                <label>Alter Status Allocation</label>
+                                <select id="admin-edit-match-status" class="input-field" style="padding: 6px; font-size: 0.85rem;">
+                                    <option value="pending">Pending</option>
+                                    <option value="about_to_play">About To Play (Top Priority)</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="dynamic-input-row" id="admin-score-inputs-row">
+                            <div class="row-cell-input" style="width: 50%;">
+                                <label id="label-score-t1" style="font-size: 0.75rem; color: var(--text-secondary);">Team 1 Score</label>
+                                <input type="number" id="admin-score-t1" class="input-field" placeholder="0" min="0">
+                            </div>
+                            <div class="row-cell-input" style="width: 50%; padding-right: 0;">
+                                <label id="label-score-t2" style="font-size: 0.75rem; color: var(--text-secondary);">Team 2 Score</label>
+                                <input type="number" id="admin-score-t2" class="input-field" placeholder="0" min="0">
+                            </div>
+                        </div>
+                        <div style="display: table; width: 100%; margin-top: 10px;">
+                            <div style="display: table-cell; width: 65%; padding-right: 5px;">
+                                <button class="btn" style="padding: 8px; font-size: 0.85rem; background-color: var(--accent-green); margin-bottom: 0;" onclick="app.executeSubmitScores()">Commit Engine Overwrites</button>
+                            </div>
+                            <div style="display: table-cell; width: 35%; padding-left: 5px;">
+                                <button class="btn" style="padding: 8px; font-size: 0.85rem; background-color: transparent; border: 1px solid var(--accent-red); color: var(--accent-red); margin-bottom: 0;" onclick="app.executeDeleteSelectedMatch()">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="btnModifyRosterRanks" class="btn btn-secondary" style="margin-top: 15px; padding: 6px; font-size: 0.8rem; margin-bottom:0;" onclick="app.checkRosterNavigationEligibility()">Modify Roster Ranks</button>
+                </div>
+
+                <div id="matches-list-root"></div>
+            </div>
+
+            <div id="tab-content-scoreboard" class="tab-pane hidden">
+                <div class="card" style="padding: 12px 6px;">
+                    <div class="standing-table" id="scoreboard-table-root"></div>
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" style="margin-top: 20px;" onclick="router.handleDashboardExitClick()">Disconnect / Exit Event Context</button>
+        </main>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Firebase Realtime Configuration Core Profile Parameters
+        const firebaseConfig = {
+            apiKey: "AIzaSyAxi3TEhh--DX0c60BM7byPEUbWph81j2A",
+            authDomain: "scorepickle-c33d6.firebaseapp.com",
+            projectId: "scorepickle-c33d6",
+            storageBucket: "scorepickle-c33d6.firebasestorage.app",
+            messagingSenderId: "64734539489",
+            appId: "1:64734539489:web:591fb498d8b12ee38491a0"
+        };
+
+        // Initialize Firebase Node Instance
+        const firebaseApp = initializeApp(firebaseConfig);
+        const database = getDatabase(firebaseApp);
+
+        // State Machine Cache Memory
+        let globalState = {
+            tournaments: {},
+            teams: [],
+            matches: [],
+            admins: {}
+        };
+
+        // Persistent Session Memory Reference Tracking
+        let sessionAdminUser = null;
+
+        // Realtime Data Sync Pipeline Listener Hook
+        onValue(ref(database), (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                globalState.tournaments = data.tournaments || {};
+                globalState.teams = data.teams ? Object.values(data.teams) : [];
+                globalState.matches = data.matches ? Object.values(data.matches) : [];
+                globalState.admins = data.admins || {};
+                
+                // Keep the dynamic personal list views updated if admin workspace view is rendered
+                if (sessionAdminUser && !document.getElementById('view-create-tournament').classList.contains('hidden')) {
+                    app.renderOwnedTournamentsList();
+                }
+
+                // If actively viewing dashboard tabs, force immediate non-destructive screen updates
+                if (router.activeTournamentCode) {
+                    app.initDashboardDataPipeline();
+                    app.syncTournamentMetaHeaderDisplay();
+                    app.populateFilterDropdownElements();
+                    if (router.currentTab === 'matches') app.renderMatchesContainer();
+                    if (router.currentTab === 'scoreboard') app.renderLeaderboardLadder();
+                }
+            } else {
+                globalState.tournaments = {};
+                globalState.teams = [];
+                globalState.matches = [];
+                globalState.admins = {};
+            }
+        });
+
+        // Global Event Click Hook to dismiss open account interface menus natively
+        document.addEventListener('click', function() {
+            const drop = document.getElementById('adminProfileDropdown');
+            if (drop) drop.classList.add('hidden');
+        });
+
+        /**
+         * Application Routing and View Coordination State Machine
+         */
+        window.router = {
+            currentRole: 'audience', // audience | player | admin
+            activeTournamentCode: null,
+            activePlayerTeamId: null,
+            currentTab: 'matches',
+            
+            go: function(viewId) {
+                const panels = document.querySelectorAll('.view-panel');
+                for(let i=0; i<panels.length; i++) {
+                    panels[i].classList.add('hidden');
+                }
+                document.getElementById(viewId).classList.remove('hidden');
+                window.scrollTo(0,0);
+            },
+            
+            toLogin: function() {
+                this.activeTournamentCode = null;
+                this.activePlayerTeamId = null;
+                document.getElementById('activeTournamentBadge').classList.add('hidden');
+                document.getElementById('userRoleBadge').classList.add('hidden');
+                document.getElementById('globalTournamentMetaHeader').classList.add('hidden');
+                document.getElementById('portal-code-input').value = "";
+                document.getElementById('player-team-select').innerHTML = "<option value=''>-- Enter a valid code above first --</option>";
+                
+                // Reset filtering interface parameters cleanly
+                this.resetFilterInputs();
+
+                // Preserve admin navigation buttons conditionally if an authentication session is currently active
+                if (sessionAdminUser) {
+                    this.go('view-create-tournament');
+                } else {
+                    document.getElementById('adminProfileWrapper').classList.add('hidden');
+                    this.go('view-login');
+                }
+            },
+            
+            resetFilterInputs: function() {
+                if (document.getElementById('search-filter-input')) document.getElementById('search-filter-input').value = "";
+                if (document.getElementById('team-filter-dropdown')) document.getElementById('team-filter-dropdown').value = "";
+                if (document.getElementById('location-filter-dropdown')) document.getElementById('location-filter-dropdown').value = "";
+                if (document.getElementById('status-filter-dropdown')) document.getElementById('status-filter-dropdown').value = "";
+            },
+
+            setRole: function(role) {
+                this.currentRole = role;
+                const portalTitle = document.getElementById('portal-title');
+                const pIdentityBox = document.getElementById('player-identity-box');
+                const adminAuthBox = document.getElementById('admin-auth-box');
+                
+                pIdentityBox.classList.add('hidden');
+                adminAuthBox.classList.add('hidden');
+                
+                if (role === 'audience') {
+                    portalTitle.innerText = "Audience Portal Entry";
+                } else if (role === 'player') {
+                    portalTitle.innerText = "Player Roster Entry";
+                    pIdentityBox.classList.remove('hidden');
+                }
+                
+                this.go('view-enter-code');
+            },
+
+            handleHeaderBrandClick: function() {
+                if (this.activeTournamentCode) {
+                    this.handleDashboardExitClick();
+                } else if (sessionAdminUser) {
+                    this.go('view-create-tournament');
+                } else {
+                    this.toLogin();
+                }
+            },
+            
+            submitPortalCode: function() {
+                const codeInput = document.getElementById('portal-code-input').value.trim().toUpperCase();
+                if(!codeInput) { alert('Please supply a valid tournament registry access string.'); return; }
+                
+                const tournaments = globalState.tournaments;
+                if(!tournaments[codeInput]) {
+                    alert('Target tournament instance not found in Cloud Database. Verify spelling or build a fresh event configuration.');
+                    return;
+                }
+                
+                if (this.currentRole === 'player') {
+                    const teamSel = document.getElementById('player-team-select');
+                    if(!teamSel.value) {
+                        alert('Please verify tournament tracking roster and select an identity.');
+                        return;
+                    }
+                    this.activePlayerTeamId = teamSel.value;
+                }
+                
+                this.activeTournamentCode = codeInput;
+                this.launchDashboardContext();
+            },
+
+            directAdminLaunchTournament: function(code) {
+                this.currentRole = 'admin';
+                this.activeTournamentCode = code;
+                this.activePlayerTeamId = null;
+                this.launchDashboardContext();
+            },
+            
+            launchDashboardContext: function() {
+                document.getElementById('activeTournamentBadge').innerText = "Tourney: " + this.activeTournamentCode;
+                document.getElementById('activeTournamentBadge').classList.remove('hidden');
+                
+                const uBadge = document.getElementById('userRoleBadge');
+                uBadge.innerText = "Role: " + this.currentRole;
+                uBadge.classList.remove('hidden');
+                
+                const adminPanel = document.getElementById('admin-match-actions-card');
+                const pFilters = document.getElementById('player-filter-controls');
+                
+                adminPanel.classList.add('hidden');
+                pFilters.classList.add('hidden');
+                
+                if(this.currentRole === 'admin') adminPanel.classList.remove('hidden');
+                if(this.currentRole === 'player') pFilters.classList.remove('hidden');
+                
+                this.resetFilterInputs();
+                app.initDashboardDataPipeline();
+                app.syncTournamentMetaHeaderDisplay();
+                app.populateFilterDropdownElements();
+                this.switchTab('matches');
+                this.go('view-dashboard');
+            },
+            
+            switchTab: function(tabName) {
+                this.currentTab = tabName;
+                document.getElementById('tab-link-matches').classList.remove('active');
+                document.getElementById('tab-link-scoreboard').classList.remove('active');
+                document.getElementById('tab-content-matches').classList.add('hidden');
+                document.getElementById('tab-content-scoreboard').classList.add('hidden');
+                
+                if(tabName === 'matches') {
+                    document.getElementById('tab-link-matches').classList.add('active');
+                    document.getElementById('tab-content-matches').classList.remove('hidden');
+                    app.renderMatchesContainer();
+                } else {
+                    document.getElementById('tab-link-scoreboard').classList.add('active');
+                    document.getElementById('tab-content-scoreboard').classList.remove('hidden');
+                    app.renderLeaderboardLadder();
+                }
+            },
+
+            exitActiveTournamentToWorkspace: function() {
+                if (this.activeTournamentCode) {
+                    this.activeTournamentCode = null;
+                    document.getElementById('activeTournamentBadge').classList.add('hidden');
+                    document.getElementById('userRoleBadge').classList.add('hidden');
+                    document.getElementById('globalTournamentMetaHeader').classList.add('hidden');
+                }
+                if (sessionAdminUser) {
+                    app.renderOwnedTournamentsList();
+                    this.go('view-create-tournament');
+                } else {
+                    this.toLogin();
+                }
+            },
+
+            handleDashboardExitClick: function() {
+                if(confirm("Confirm structural disconnect from active tournament framework session?")) {
+                    this.exitActiveTournamentToWorkspace();
+                }
+            }
+        };
+
+        /**
+         * Authentication Controller Driver Logic
+         */
+        window.auth = {
+            login: function() {
+                const u = document.getElementById('login-user').value.trim();
+                const p = document.getElementById('login-pass').value.trim();
+                
+                if(!u || !p) { alert('Credential verification inputs required.'); return; }
+                
+                const dbRef = ref(database);
+                get(child(dbRef, 'admins/' + u)).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const adminData = snapshot.val();
+                        if (adminData.password === p) {
+                            sessionAdminUser = u;
+                            router.currentRole = 'admin';
+                            
+                            document.getElementById('adminUserMenuBtn').innerText = "Account: " + u;
+                            document.getElementById('adminProfileWrapper').classList.remove('hidden');
+                            
+                            app.renderOwnedTournamentsList();
+                            router.go('view-create-tournament');
+                            
+                            document.getElementById('login-user').value = "";
+                            document.getElementById('login-pass').value = "";
+                        } else {
+                            alert("Authentication Failure: Incorrect password supplied.");
+                        }
+                    } else {
+                        alert("Authentication Failure: Target Admin Username record not found.");
+                    }
+                }).catch(err => alert("Database Gateway Error: " + err.message));
+            },
+
+            register: function() {
+                const u = document.getElementById('login-user').value.trim();
+                const p = document.getElementById('login-pass').value.trim();
+                
+                if(!u || !p) { alert('Username and Password parameters required to initialize registration.'); return; }
+                if(u.includes('.') || u.includes('#') || u.includes('$') || u.includes('[') || u.includes(']')) {
+                    alert('Username format violation: Characters ".", "#", "$", "[", or "]" are prohibited.');
+                    return;
+                }
+
+                const dbRef = ref(database);
+                get(child(dbRef, 'admins/' + u)).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        alert("Conflict Error: Admin username identity already claimed on Firebase network.");
+                    } else {
+                        set(ref(database, 'admins/' + u), {
+                            username: u,
+                            password: p
+                        }).then(() => {
+                            alert("Success: Administrative profile committed to database node. Please click Sign In to enter.");
+                        });
+                    }
+                }).catch(err => alert("Database Storage Error: " + err.message));
+            },
+
+            logout: function() {
+                sessionAdminUser = null;
+                router.currentRole = 'audience';
+                router.activeTournamentCode = null;
+                router.activePlayerTeamId = null;
+                
+                document.getElementById('adminProfileWrapper').classList.add('hidden');
+                document.getElementById('activeTournamentBadge').classList.add('hidden');
+                document.getElementById('userRoleBadge').classList.add('hidden');
+                document.getElementById('globalTournamentMetaHeader').classList.add('hidden');
+                
+                router.go('view-login');
+            }
+        };
+
+        /**
+         * Core ScorePickle State Mutation & Render Processing Pipeline
+         */
+        window.app = {
+            matchFilter: 'all', // all | mine
+            
+            handlePortalCodeInput: function(val) {
+                const cleanCode = val.trim().toUpperCase();
+                if (router.currentRole === 'player' && cleanCode.length >= 3) {
+                    const filteredTeams = globalState.teams.filter(t => t.tournamentCode === cleanCode);
+                    const selectEl = document.getElementById('player-team-select');
+                    selectEl.innerHTML = "";
+                    
+                    if(filteredTeams.length > 0) {
+                        filteredTeams.forEach(t => {
+                            let opt = document.createElement('option');
+                            opt.value = t.id;
+                            opt.innerText = t.name;
+                            selectEl.appendChild(opt);
+                        });
+                    } else {
+                        selectEl.innerHTML = "<option value=''>-- No registered teams discovered --</option>";
+                    }
+                }
+            },
+
+            syncTournamentMetaHeaderDisplay: function() {
+                const rootHeader = document.getElementById('globalTournamentMetaHeader');
+                const adminEditWrapper = document.getElementById('adminEditTournButtonWrapper');
+                
+                if (!router.activeTournamentCode) {
+                    rootHeader.classList.add('hidden');
+                    adminEditWrapper.classList.add('hidden');
+                    return;
+                }
+
+                const currentTourn = globalState.tournaments[router.activeTournamentCode];
+                if (currentTourn) {
+                    document.getElementById('metaHeaderTitle').innerText = currentTourn.name;
+                    const dateString = currentTourn.date ? ` • Scheduled: ${currentTourn.date}` : "";
+                    document.getElementById('metaHeaderSub').innerText = `Organized by: ${currentTourn.adminName || currentTourn.creator || 'Staff'}${dateString}`;
+                    rootHeader.classList.remove('hidden');
+                    
+                    // Show edit tournament shortcut link metadata if role matches admin credentials
+                    if (router.currentRole === 'admin') {
+                        adminEditWrapper.classList.remove('hidden');
+                    } else {
+                        adminEditWrapper.classList.add('hidden');
+                    }
+                } else {
+                    rootHeader.classList.add('hidden');
+                    adminEditWrapper.classList.add('hidden');
+                }
+            },
+
+            executeSaveTournamentEdit: function() {
+                const oldCode = router.activeTournamentCode;
+                const newName = document.getElementById('edit-tourn-name').value.trim();
+                const newDate = document.getElementById('edit-tourn-date').value;
+                const newCode = document.getElementById('edit-tourn-code').value.trim().toUpperCase();
+                const newSecret = document.getElementById('edit-tourn-secret').value.trim();
+
+                if (!newName || !newDate || !newCode || !newSecret) {
+                    alert('All input structural validation criteria are required.');
+                    return;
+                }
+
+                // Conflict validation check if code has changed
+                if (newCode !== oldCode && globalState.tournaments[newCode]) {
+                    alert('The new tournament code is already claimed on the database network. Choose an alternative key.');
+                    return;
+                }
+
+                const targetTourn = globalState.tournaments[oldCode];
+                let updates = {};
+
+                // Structure modification layout data mapper configuration setup block
+                if (newCode === oldCode) {
+                    // Update current path node entry fields safely
+                    updates[`tournaments/${oldCode}/name`] = newName;
+                    updates[`tournaments/${oldCode}/date`] = newDate;
+                    updates[`tournaments/${oldCode}/adminCode`] = newSecret;
+                } else {
+                    // Re-index all child node tree schemas cleanly
+                    updates[`tournaments/${newCode}`] = {
+                        name: newName,
+                        date: newDate,
+                        code: newCode,
+                        adminCode: newSecret,
+                        creator: targetTourn.creator,
+                        adminName: targetTourn.adminName || targetTourn.creator
+                    };
+                    updates[`tournaments/${oldCode}`] = null;
+
+                    // Migrate underlying Team Roster Nodes
+                    globalState.teams.forEach(t => {
+                        if (t.tournamentCode === oldCode) {
+                            updates[`teams/${t.id}/tournamentCode`] = newCode;
+                        }
+                    });
+
+                    // Migrate underlying Match Fixture Data Nodes
+                    globalState.matches.forEach(m => {
+                        if (m.tournamentCode === oldCode) {
+                            updates[`matches/${m.id}/tournamentCode`] = newCode;
+                        }
+                    });
+                }
+
+                update(ref(database), updates).then(() => {
+                    alert("Tournament metadata assets synchronized perfectly.");
+                    router.activeTournamentCode = newCode;
+                    router.launchDashboardContext();
+                }).catch(err => alert("Cloud Error: " + err.message));
+            },
+
+            populateFilterDropdownElements: function() {
+                const teamDropdown = document.getElementById('team-filter-dropdown');
+                const locDropdown = document.getElementById('location-filter-dropdown');
+                if (!teamDropdown || !locDropdown) return;
+
+                const cachedTeam = teamDropdown.value;
+                const cachedLoc = locDropdown.value;
+
+                teamDropdown.innerHTML = '<option value="">All Teams</option>';
+                locDropdown.innerHTML = '<option value="">All Locations/Courts</option>';
+
+                const filteredTeams = globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode);
+                filteredTeams.forEach(t => {
+                    let opt = document.createElement('option');
+                    opt.value = t.id;
+                    opt.innerText = t.name;
+                    teamDropdown.appendChild(opt);
+                });
+
+                const filteredMatches = globalState.matches.filter(m => m.tournamentCode === router.activeTournamentCode);
+                const uniqueCourts = [...new Set(filteredMatches.map(m => m.court || "Main Court"))];
+                uniqueCourts.forEach(c => {
+                    let opt = document.createElement('option');
+                    opt.value = c;
+                    opt.innerText = c;
+                    locDropdown.appendChild(opt);
+                });
+
+                if (cachedTeam && filteredTeams.some(t => t.id === cachedTeam)) teamDropdown.value = cachedTeam;
+                if (cachedLoc && uniqueCourts.includes(cachedLoc)) locDropdown.value = cachedLoc;
+            },
+
+            renderOwnedTournamentsList: function() {
+                const root = document.getElementById('ownedTournamentsRoot');
+                if (!root) return;
+                root.innerHTML = "";
+
+                const allTournies = Object.values(globalState.tournaments);
+                const filtered = allTournies.filter(t => t.creator === sessionAdminUser);
+
+                if (filtered.length === 0) {
+                    root.innerHTML = "<div style='font-size:0.85rem; color:var(--text-secondary); text-align:center; padding:15px;'>No event assets linked to this account database structure yet.</div>";
+                    return;
+                }
+
+                filtered.forEach(t => {
+                    const card = document.createElement('div');
+                    card.className = 'tournament-list-card';
+                    
+                    card.innerHTML = `
+                        <div class="tourn-card-info">
+                            <div class="tourn-card-title" onclick="router.directAdminLaunchTournament('${t.code}')">${t.name}</div>
+                            <div class="tourn-card-meta">
+                                <strong>Date:</strong> ${t.date || 'Unspecified'} &nbsp;|&nbsp; 
+                                <strong>Event Code:</strong> <span style="color:var(--primary-blue); font-weight:700;">${t.code}</span> &nbsp;|&nbsp; 
+                                <strong>Admin Key:</strong> <code>${t.adminCode}</code>
+                            </div>
+                        </div>
+                        <div class="tourn-card-actions">
+                            <button class="btn btn-danger" style="padding:4px 8px; font-size:0.75rem;" onclick="app.executeDeleteEntireTournament('${t.code}')">🗑️</button>
+                        </div>
+                    `;
+                    root.appendChild(card);
+                });
+            },
+            
+            executeCreateTournament: function() {
+                const name = document.getElementById('create-tourn-name').value.trim();
+                const dateVal = document.getElementById('create-tourn-date').value;
+                const code = document.getElementById('create-tourn-code').value.trim().toUpperCase();
+                const secret = document.getElementById('create-tourn-secret').value.trim();
+                
+                if(!name || !dateVal || !code || !secret) { alert('All configuration setup inputs, including date records, are strictly mandatory.'); return; }
+                if(!sessionAdminUser) { alert('Session loss context error: Please authenticate admin profile state again.'); return; }
+                
+                if(globalState.tournaments[code]) { alert('Conflict: Tournament Registry String Code already claimed on Firebase network.'); return; }
+                
+                set(ref(database, 'tournaments/' + code), {
+                    name: name,
+                    date: dateVal,
+                    creator: sessionAdminUser,
+                    adminName: sessionAdminUser, 
+                    adminCode: secret,
+                    code: code
+                }).then(() => {
+                    router.activeTournamentCode = code;
+                    router.currentRole = 'admin';
+                    
+                    document.getElementById('create-tourn-name').value = "";
+                    document.getElementById('create-tourn-date').value = "";
+                    document.getElementById('create-tourn-code').value = "";
+                    document.getElementById('create-tourn-secret').value = "";
+
+                    document.getElementById('dynamic-team-rows-root').innerHTML = "";
+                    app.addNewTeamInputRow();
+                    app.updateTeamUIBadgeCount();
+                    router.go('view-teams-management');
+                }).catch(err => alert("Cloud Error: " + err.message));
+            },
+
+            executeDeleteEntireTournament: function(tournCode) {
+                const target = globalState.tournaments[tournCode];
+                if (!target) return;
+
+                const confPrompt = `⚠️ IRREVERSIBLE DESTRUCTION WARNING ⚠️\n\nAre you absolutely certain you want to completely DELETE the tournament instance:\n"${target.name}" (${tournCode})?\n\nThis completely deletes all registered team items, rosters, and match data assets. This action cannot be reversed!`;
+                
+                if (confirm(confPrompt)) {
+                    let updates = {};
+                    updates['tournaments/' + tournCode] = null;
+                    
+                    globalState.teams.forEach(t => {
+                        if (t.tournamentCode === tournCode) updates['teams/' + t.id] = null;
+                    });
+                    
+                    globalState.matches.forEach(m => {
+                        if (m.tournamentCode === tournCode) updates['matches/' + m.id] = null;
+                    });
+
+                    update(ref(database), updates).then(() => {
+                        alert("Tournament instance metadata cleanly purged from database.");
+                        app.renderOwnedTournamentsList();
+                    }).catch(err => alert("Purge Gateway failure: " + err.message));
+                }
+            },
+            
+            addNewTeamInputRow: function() {
+                const root = document.getElementById('dynamic-team-rows-root');
+                const rowId = 'tr_' + Math.random().toString(36).substr(2, 9);
+                
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'dynamic-input-row';
+                rowDiv.id = rowId;
+                
+                rowDiv.innerHTML = `
+                    <div class="row-cell-input">
+                        <input type="text" class="input-field team-roster-name-input" placeholder="Enter uniquely identified team name...">
+                    </div>
+                    <div class="row-cell-action">
+                        <button class="btn btn-danger" onclick="app.removeTeamInputRow('${rowId}')">🗑️</button>
+                    </div>
+                `;
+                root.appendChild(rowDiv);
+                
+                const input = rowDiv.querySelector('.team-roster-name-input');
+                input.addEventListener('keydown', function(e) {
+                    if(e.key === 'Enter') {
+                        e.preventDefault();
+                        app.addNewTeamInputRow();
+                        setTimeout(() => {
+                            const inputs = document.querySelectorAll('.team-roster-name-input');
+                            if(inputs.length > 0) inputs[inputs.length - 1].focus();
+                        }, 50);
+                    }
+                });
+                
+                this.updateTeamUIBadgeCount();
+            },
+            
+            removeTeamInputRow: function(rowId) {
+                const row = document.getElementById(rowId);
+                if(row) row.parentNode.removeChild(row);
+                this.updateTeamUIBadgeCount();
+            },
+            
+            updateTeamUIBadgeCount: function() {
+                const count = document.querySelectorAll('.team-roster-name-input').length;
+                document.getElementById('team-counter-badge').innerText = "Total Rows: " + count;
+            },
+
+            checkRosterNavigationEligibility: function() {
+                // Feature #4 requirement: Admin can always edit, safety blockage checks removed to permit runtime flexibility.
+                const root = document.getElementById('dynamic-team-rows-root');
+                root.innerHTML = "";
+                const matchedTeams = globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode);
+
+                if (matchedTeams.length > 0) {
+                    matchedTeams.forEach(t => {
+                        const rowId = 'tr_' + Math.random().toString(36).substr(2, 9);
+                        const rowDiv = document.createElement('div');
+                        rowDiv.className = 'dynamic-input-row';
+                        rowDiv.id = rowId;
+                        rowDiv.innerHTML = `
+                            <div class="row-cell-input">
+                                <input type="text" class="input-field team-roster-name-input" value="${t.name}" placeholder="Enter uniquely identified team name...">
+                            </div>
+                            <div class="row-cell-action">
+                                <button class="btn btn-danger" onclick="app.removeTeamInputRow('${rowId}')">🗑️</button>
+                            </div>
+                        `;
+                        root.appendChild(rowDiv);
+                    });
+                } else {
+                    app.addNewTeamInputRow();
+                }
+
+                app.updateTeamUIBadgeCount();
+                router.go('view-teams-management');
+            },
+            
+            submitTeamRoster: function() {
+                const inputs = document.querySelectorAll('.team-roster-name-input');
+                let updates = {};
+                let count = 0;
+                
+                globalState.teams.forEach(t => {
+                    if(t.tournamentCode === router.activeTournamentCode) {
+                        updates['teams/' + t.id] = null;
+                    }
+                });
+                
+                for(let i=0; i<inputs.length; i++) {
+                    let val = inputs[i].value.trim();
+                    if(val) {
+                        let newId = 'team_' + Math.random().toString(36).substr(2, 9) + '_' + i;
+                        updates['teams/' + newId] = {
+                            id: newId,
+                            tournamentCode: router.activeTournamentCode,
+                            name: val
+                        };
+                        count++;
+                    }
+                }
+                
+                if(count < 2) { alert('Minimum system processing threshold requires at least 2 distinct teams.'); return; }
+                
+                update(ref(database), updates).then(() => {
+                    alert('Saved ' + count + ' team data assets to Google Firebase Node.');
+                    router.launchDashboardContext();
+                });
+            },
+            
+            initDashboardDataPipeline: function() {
+                const filteredTeams = globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode);
+                
+                const t1Select = document.getElementById('match-create-t1');
+                const t2Select = document.getElementById('match-create-t2');
+                
+                if(!t1Select || !t2Select) return;
+                
+                t1Select.innerHTML = "";
+                t2Select.innerHTML = "";
+                
+                for(let i=0; i<filteredTeams.length; i++) {
+                    let o1 = document.createElement('option'); o1.value = filteredTeams[i].id; o1.innerText = filteredTeams[i].name;
+                    let o2 = document.createElement('option'); o2.value = filteredTeams[i].id; o2.innerText = filteredTeams[i].name;
+                    t1Select.appendChild(o1);
+                    t2Select.appendChild(o2);
+                }
+                
+                this.syncAdminScoreSelectionDropdown(filteredTeams);
+            },
+            
+            syncAdminScoreSelectionDropdown: function(cachedFilteredTeams) {
+                const fMatches = globalState.matches.filter(m => m.tournamentCode === router.activeTournamentCode);
+                const teamsMap = {};
+                
+                const teamsList = cachedFilteredTeams || globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode);
+                teamsList.forEach(t => { teamsMap[t.id] = t.name; });
+                
+                const mSelect = document.getElementById('admin-score-match-select');
+                if(!mSelect) return;
+                
+                const cachedSelectionVal = mSelect.value;
+                mSelect.innerHTML = "<option value=''>-- Choose Target Match Node --</option>";
+                
+                fMatches.forEach(m => {
+                    let opt = document.createElement('option');
+                    opt.value = m.id;
+                    let displayName = m.matchName || `Match ${m.autoIndex || ''}`;
+                    let label = `${displayName}: ${teamsMap[m.team1Id] || 'Deleted'} vs ${teamsMap[m.team2Id] || 'Deleted'} (${m.court || 'No Court'}) [${m.status.toUpperCase().replace(/_/g, ' ')}]`;
+                    opt.innerText = label;
+                    mSelect.appendChild(opt);
+                });
+
+                if (cachedSelectionVal && fMatches.some(m => m.id === cachedSelectionVal)) {
+                    mSelect.value = cachedSelectionVal;
+                }
+                
+                this.syncScoreFieldsWithSelectedMatch();
+            },
+            
+            syncScoreFieldsWithSelectedMatch: function() {
+                const matchId = document.getElementById('admin-score-match-select').value;
+                const lbl1 = document.getElementById('label-score-t1');
+                const lbl2 = document.getElementById('label-score-t2');
+                const sandbox = document.getElementById('admin-edit-sandbox-fields');
+                const adminTitle = document.getElementById('admin-panel-mode-title');
+                
+                if(!matchId) {
+                    if(lbl1) lbl1.innerText = "Team 1 Score";
+                    if(lbl2) lbl2.innerText = "Team 2 Score";
+                    document.getElementById('admin-score-t1').value = "";
+                    document.getElementById('admin-score-t2').value = "";
+                    sandbox.classList.add('hidden');
+                    adminTitle.innerText = "Admin Management Dashboard: Create";
+                    return;
+                }
+                
+                const target = globalState.matches.find(m => m.id === matchId);
+                if(target) {
+                    adminTitle.innerText = "Admin Management Dashboard: Edit Selected";
+                    const t1 = globalState.teams.find(t => t.id === target.team1Id);
+                    const t2 = globalState.teams.find(t => t.id === target.team2Id);
+                    
+                    if(lbl1) lbl1.innerText = (t1 ? t1.name : "Team 1") + " Score";
+                    if(lbl2) lbl2.innerText = (t2 ? t2.name : "Team 2") + " Score";
+                    
+                    document.getElementById('admin-score-t1').value = target.team1Score !== undefined ? target.team1Score : 0;
+                    document.getElementById('admin-score-t2').value = target.team2Score !== undefined ? target.team2Score : 0;
+                    
+                    // Feature #4 Implementation: Populate and show structural metadata edit fields
+                    document.getElementById('admin-edit-match-name').value = target.matchName || "";
+                    document.getElementById('admin-edit-match-court').value = target.court || "Main Court";
+                    document.getElementById('admin-edit-match-status').value = target.status || "pending";
+                    sandbox.classList.remove('hidden');
+                }
+            },
+            
+            executeCreateMatch: function() {
+                const t1 = document.getElementById('match-create-t1').value;
+                const t2 = document.getElementById('match-create-t2').value;
+                const court = document.getElementById('match-create-court').value.trim() || "Main Court";
+                let customName = document.getElementById('match-create-name').value.trim();
+                const initialStatus = document.getElementById('match-create-status').value;
+                
+                if(!t1 || !t2) { alert('Requires structural team mapping validation inputs.'); return; }
+                if(t1 === t2) { alert('Self-pairing rule violation: A team cannot play against itself.'); return; }
+                
+                // Feature #1 Requirement: Fallback sequential numbering calculation engine if name omitted
+                const currentTournamentMatches = globalState.matches.filter(m => m.tournamentCode === router.activeTournamentCode);
+                const sequentialIndex = currentTournamentMatches.length + 1;
+                
+                const matchId = 'match_' + Math.random().toString(36).substr(2, 9);
+                const newMatch = {
+                    id: matchId,
+                    tournamentCode: router.activeTournamentCode,
+                    team1Id: t1,
+                    team2Id: t2,
+                    team1Score: 0,
+                    team2Score: 0,
+                    court: court,
+                    status: initialStatus,
+                    matchName: customName || "", 
+                    autoIndex: sequentialIndex
+                };
+                
+                set(ref(database, 'matches/' + matchId), newMatch).then(() => {
+                    document.getElementById('match-create-court').value = "";
+                    document.getElementById('match-create-name').value = "";
+                    document.getElementById('match-create-status').value = "pending";
+                    this.initDashboardDataPipeline();
+                });
+            },
+            
+            executeSubmitScores: function() {
+                const matchId = document.getElementById('admin-score-match-select').value;
+                const s1Str = document.getElementById('admin-score-t1').value;
+                const s2Str = document.getElementById('admin-score-t2').value;
+                
+                if(!matchId || s1Str === "" || s2Str === "") { alert('Ensure valid target node mapping and point integer allocations.'); return; }
+                
+                const s1 = parseInt(s1Str, 10);
+                const s2 = parseInt(s2Str, 10);
+                
+                // Feature #4 & #2 Structural Update Engine modifications
+                const updatedMatchName = document.getElementById('admin-edit-match-name').value.trim();
+                const updatedCourt = document.getElementById('admin-edit-match-court').value.trim() || "Main Court";
+                const updatedStatus = document.getElementById('admin-edit-match-status').value;
+
+                const updates = {};
+                updates[`matches/${matchId}/team1Score`] = s1;
+                updates[`matches/${matchId}/team2Score`] = s2;
+                updates[`matches/${matchId}/status`] = updatedStatus;
+                updates[`matches/${matchId}/matchName`] = updatedMatchName;
+                updates[`matches/${matchId}/court`] = updatedCourt;
+                
+                update(ref(database), updates).then(() => {
+                    document.getElementById('admin-score-match-select').value = "";
+                    document.getElementById('admin-score-t1').value = "";
+                    document.getElementById('admin-score-t2').value = "";
+                    document.getElementById('admin-edit-sandbox-fields').classList.add('hidden');
+                    document.getElementById('admin-panel-mode-title').innerText = "Admin Management Dashboard: Create";
+                    this.initDashboardDataPipeline();
+                    alert("Match modifications and point dimensions securely updated.");
+                });
+            },
+
+            executeDeleteSelectedMatch: function() {
+                const matchId = document.getElementById('admin-score-match-select').value;
+                if (!matchId) { alert('Please choose an item inside the target selection dropdown list to remove.'); return; }
+
+                const targetMatch = globalState.matches.find(m => m.id === matchId);
+                if (!targetMatch) return;
+
+                const teamsMap = {};
+                globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode).forEach(t => {
+                    teamsMap[t.id] = t.name;
+                });
+
+                const t1 = teamsMap[targetMatch.team1Id] || "Deleted Team";
+                const t2 = teamsMap[targetMatch.team2Id] || "Deleted Team";
+
+                const warningPrompt = `⚠️ ADMINISTRATIVE CONFIRMATION DETECTED ⚠️\n\nAre you absolutely sure you want to permanently delete the following match fixture:\n"${t1} vs ${t2} [Court: ${targetMatch.court}]"?\n\nThis action cannot be undone!`;
+
+                if (confirm(warningPrompt)) {
+                    set(ref(database, 'matches/' + matchId), null).then(() => {
+                        alert("Match item purged successfully from dynamic environment context.");
+                        document.getElementById('admin-score-match-select').value = "";
+                        document.getElementById('admin-score-t1').value = "";
+                        document.getElementById('admin-score-t2').value = "";
+                        document.getElementById('admin-edit-sandbox-fields').classList.add('hidden');
+                        document.getElementById('admin-panel-mode-title').innerText = "Admin Management Dashboard: Create";
+                        this.initDashboardDataPipeline();
+                    }).catch(err => alert("Cloud purging communication failure: " + err.message));
+                }
+            },
+            
+            setMatchFilter: function(filterType) {
+                this.matchFilter = filterType;
+                document.getElementById('filter-pill-all').classList.remove('active');
+                document.getElementById('filter-pill-mine').classList.remove('active');
+                
+                if(filterType === 'all') document.getElementById('filter-pill-all').classList.add('active');
+                if(filterType === 'mine') document.getElementById('filter-pill-mine').classList.add('active');
+                
+                this.renderMatchesContainer();
+            },
+            
+            renderMatchesContainer: function() {
+                const root = document.getElementById('matches-list-root');
+                if(!root) return;
+                root.innerHTML = "";
+                
+                let fMatches = globalState.matches.filter(m => m.tournamentCode === router.activeTournamentCode);
+                
+                // Incorporate original role filter matrices
+                if(router.currentRole === 'player' && this.matchFilter === 'mine') {
+                    fMatches = fMatches.filter(m => m.team1Id === router.activePlayerTeamId || m.team2Id === router.activePlayerTeamId);
+                }
+                
+                // Feature #3 Layout Advanced filtering execution algorithm blocks
+                const searchVal = document.getElementById('search-filter-input') ? document.getElementById('search-filter-input').value.toLowerCase().trim() : "";
+                const teamVal = document.getElementById('team-filter-dropdown') ? document.getElementById('team-filter-dropdown').value : "";
+                const locVal = document.getElementById('location-filter-dropdown') ? document.getElementById('location-filter-dropdown').value : "";
+                const statusVal = document.getElementById('status-filter-dropdown') ? document.getElementById('status-filter-dropdown').value : "";
+
+                const teamsMap = {};
+                globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode).forEach(t => {
+                    teamsMap[t.id] = t.name;
+                });
+
+                fMatches = fMatches.filter(m => {
+                    const t1Name = (teamsMap[m.team1Id] || "").toLowerCase();
+                    const t2Name = (teamsMap[m.team2Id] || "").toLowerCase();
+                    const mCustomName = (m.matchName || "").toLowerCase();
+                    const defaultName = `match ${m.autoIndex || ""}`;
+                    
+                    // Search box conditional evaluation logic
+                    if (searchVal && !t1Name.includes(searchVal) && !t2Name.includes(searchVal) && !mCustomName.includes(searchVal) && !defaultName.includes(searchVal)) {
+                        return false;
+                    }
+                    // Dropdown specific target criteria evaluations
+                    if (teamVal && m.team1Id !== teamVal && m.team2Id !== teamVal) return false;
+                    if (locVal && (m.court || "Main Court") !== locVal) return false;
+                    if (statusVal && m.status !== statusVal) return false;
+
+                    return true;
+                });
+
+                // Feature #2 Priority sorting alignment structure allocation blocks
+                // Priority matrix ordering layout assignment: about_to_play -> pending -> completed
+                fMatches.sort((a, b) => {
+                    const statusWeights = { 'about_to_play': 1, 'pending': 2, 'completed': 3 };
+                    const weightA = statusWeights[a.status] || 4;
+                    const weightB = statusWeights[b.status] || 4;
+                    
+                    if (weightA !== weightB) {
+                        return weightA - weightB; // Ascending sort brings lower weight values to top 
+                    }
+                    // Reverse cron fallback sorting index within identical status tiers
+                    return (b.autoIndex || 0) - (a.autoIndex || 0);
+                });
+                
+                if(fMatches.length === 0) {
+                    root.innerHTML = "<div style='text-align:center; padding:30px; color:var(--text-secondary); font-size:0.9rem;'>No active game records parsed matching lookup criteria.</div>";
+                    return;
+                }
+                
+                for(let i = 0; i < fMatches.length; i++) {
+                    let m = fMatches[i];
+                    let card = document.createElement('div');
+                    card.className = 'match-card';
+                    
+                    let isT1Winner = m.status === 'completed' && m.team1Score > m.team2Score;
+                    let isT2Winner = m.status === 'completed' && m.team2Score > m.team1Score;
+                    let isTieResult = m.status === 'completed' && m.team1Score === m.team2Score;
+                    
+                    let highlightBorderCSS = "";
+                    if (m.status === 'about_to_play') {
+                        highlightBorderCSS = "border-left: 4px dashed #ff781e; background-color: rgba(255,120,30,0.06);";
+                    } else if(router.currentRole === 'player' && (m.team1Id === router.activePlayerTeamId || m.team2Id === router.activePlayerTeamId)) {
+                        highlightBorderCSS = "border-left: 4px solid var(--primary-blue);";
+                    }
+                    if(highlightBorderCSS) card.setAttribute('style', highlightBorderCSS);
+                    
+                    // Formatting clean status tags text output rendering logic
+                    let displayStatusText = m.status.replace(/_/g, ' ');
+                    let displayMatchTitle = m.matchName ? m.matchName : `Match ${m.autoIndex || ''}`;
+
+                    card.innerHTML = `
+                        <div class="match-header">
+                            <div class="match-court"><strong>${displayMatchTitle}</strong> • 📍 ${m.court}</div>
+                            <div class="match-status ${m.status}">${displayStatusText}</div>
+                        </div>
+                        <div class="match-body-table">
+                            <div class="match-team-row ${(isT1Winner || (isTieResult && m.status === 'completed')) ? 'winner' : ''}">
+                                <div class="match-team-name">${teamsMap[m.team1Id] || 'Unknown Team'} ${m.team1Id === router.activePlayerTeamId ? '<strong>(You)</strong>' : ''}</div>
+                                <div class="match-team-score">${(m.status === 'completed' || m.team1Score > 0 || m.team2Score > 0) ? m.team1Score : '-'}</div>
+                            </div>
+                            <div class="match-team-row ${(isT2Winner || (isTieResult && m.status === 'completed')) ? 'winner' : ''}">
+                                <div class="match-team-name">${teamsMap[m.team2Id] || 'Unknown Team'} ${m.team2Id === router.activePlayerTeamId ? '<strong>(You)</strong>' : ''}</div>
+                                <div class="match-team-score">${(m.status === 'completed' || m.team1Score > 0 || m.team2Score > 0) ? m.team2Score : '-'}</div>
+                            </div>
+                        </div>
+                    `;
+                    root.appendChild(card);
+                }
+            },
+            
+            renderLeaderboardLadder: function() {
+                const root = document.getElementById('scoreboard-table-root');
+                if(!root) return;
+                root.innerHTML = "";
+                
+                const allTeams = globalState.teams.filter(t => t.tournamentCode === router.activeTournamentCode);
+                const allMatches = globalState.matches.filter(m => m.tournamentCode === router.activeTournamentCode && m.status === 'completed');
+                
+                const stats = {};
+                allTeams.forEach(t => {
+                    // Feature #5 Requirement: Expanded data properties schema mapping tracking ties column blocks
+                    stats[t.id] = { id: t.id, name: t.name, wins: 0, losses: 0, ties: 0, pointsScored: 0, pointsAllowed: 0, totalGames: 0 };
+                });
+                
+                allMatches.forEach(m => {
+                    if(stats[m.team1Id] && stats[m.team2Id]) {
+                        stats[m.team1Id].pointsScored += m.team1Score;
+                        stats[m.team1Id].pointsAllowed += m.team2Score;
+                        stats[m.team1Id].totalGames += 1;
+                        
+                        stats[m.team2Id].pointsScored += m.team2Score;
+                        stats[m.team2Id].pointsAllowed += m.team1Score;
+                        stats[m.team2Id].totalGames += 1;
+                        
+                        // Feature #5 core condition evaluation processing algorithm logic
+                        if (m.team1Score === m.team2Score) {
+                            stats[m.team1Id].ties += 1;
+                            stats[m.team2Id].ties += 1;
+                        } else if(m.team1Score > m.team2Score) {
+                            stats[m.team1Id].wins += 1;
+                            stats[m.team2Id].losses += 1;
+                        } else {
+                            stats[m.team2Id].wins += 1;
+                            stats[m.team1Id].losses += 1;
+                        }
+                    }
+                });
+                
+                let sortedList = Object.values(stats);
+                
+                sortedList.sort((a, b) => {
+                    // Standings Calculation Metrics Priority Logic: Win Ratio (Wins + 0.5*Ties) -> Point Differential -> Points For
+                    let pointsA = a.wins * 3 + a.ties * 1;
+                    let pointsB = b.wins * 3 + b.ties * 1;
+                    if(pointsB !== pointsA) return pointsB - pointsA;
+                    
+                    let diffA = a.pointsScored - a.pointsAllowed;
+                    let diffB = b.pointsScored - b.pointsAllowed;
+                    if(diffB !== diffA) return diffB - diffA;
+                    
+                    return b.pointsScored - a.pointsScored;
+                });
+                
+                let header = document.createElement('div');
+                header.className = 'standing-row header-row';
+                // Feature #5 Requirement: Updated headers view layout matrix block to display ties clearly
+                header.innerHTML = `
+                    <div class="standing-cell" style="width: 45%;">Rank / Team</div>
+                    <div class="standing-cell center" style="width: 25%;">W-L-T</div>
+                    <div class="standing-cell right" style="width: 15%;">Diff</div>
+                    <div class="standing-cell right" style="width: 15%;">PF</div>
+                `;
+                root.appendChild(header);
+                
+                sortedList.forEach((stat, index) => {
+                    let row = document.createElement('div');
+                    row.className = 'standing-row';
+                    if(router.currentRole === 'player' && stat.id === router.activePlayerTeamId) {
+                        row.classList.add('highlighted-team');
+                    }
+                    
+                    let diff = stat.pointsScored - stat.pointsAllowed;
+                    let signedDiff = diff > 0 ? ('+' + diff) : diff;
+                    
+                    row.innerHTML = `
+                        <div class="standing-cell"><strong>#${index + 1}</strong> &nbsp;${stat.name}</div>
+                        <div class="standing-cell center">${stat.wins}-${stat.losses}-${stat.ties}</div>
+                        <div class="standing-cell right">${signedDiff}</div>
+                        <div class="standing-cell right">${stat.pointsScored}</div>
+                    `;
+                    root.appendChild(row);
+                });
+            }
+        };
+
+        /**
+         * Global View Layout Theme Interface Styling Controller Context
+         */
+        window.ui = {
+            toggleTheme: function() {
+                const body = document.body;
+                const btn = document.getElementById('modeToggleBtn');
+                if(body.classList.contains('light-mode')) {
+                    body.classList.remove('light-mode');
+                    btn.innerText = "☀️ Light";
+                } else {
+                    body.classList.add('light-mode');
+                    btn.innerText = "🌙 Dark";
+                }
+            },
+
+            toggleProfileDropdown: function(event) {
+                event.stopPropagation();
+                const dropdown = document.getElementById('adminProfileDropdown');
+                dropdown.classList.toggle('hidden');
+            },
+
+            // Feature #6 Management console invocation block configuration
+            showEditTournamentModal: function() {
+                const target = globalState.tournaments[router.activeTournamentCode];
+                if (!target) return;
+
+                document.getElementById('edit-tourn-name').value = target.name || "";
+                document.getElementById('edit-tourn-date').value = target.date || "";
+                document.getElementById('edit-tourn-code').value = target.code || "";
+                document.getElementById('edit-tourn-secret').value = target.adminCode || "";
+
+                router.go('view-edit-tournament');
+            },
+
+            promptChangeUsername: function() {
+                if (!sessionAdminUser) return;
+                const current = sessionAdminUser;
+                const newUser = prompt("Input fresh replacement identity string moniker:", current);
+                if (!newUser) return;
+                const cleanNewUser = newUser.trim();
+                
+                if (!cleanNewUser || cleanNewUser === current) return;
+                if(cleanNewUser.includes('.') || cleanNewUser.includes('#') || cleanNewUser.includes('$') || cleanNewUser.includes('[') || cleanNewUser.includes(']')) {
+                    alert('Format violation: Special path characters are prohibited.');
+                    return;
+                }
+
+                get(child(ref(database), 'admins/' + cleanNewUser)).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        alert("Modification Aborted: Target replacement name is already claimed.");
+                    } else {
+                        const targetPassword = globalState.admins[current].password;
+                        let updates = {};
+                        
+                        updates['admins/' + cleanNewUser] = { username: cleanNewUser, password: targetPassword };
+                        updates['admins/' + current] = null;
+
+                        Object.values(globalState.tournaments).forEach(t => {
+                            if (t.creator === current) {
+                                updates[`tournaments/${t.code}/creator`] = cleanNewUser;
+                                updates[`tournaments/${t.code}/adminName`] = cleanNewUser;
+                            }
+                        });
+
+                        update(ref(database), updates).then(() => {
+                            alert("Username database keys synchronized successfully.");
+                            sessionAdminUser = cleanNewUser;
+                            document.getElementById('adminUserMenuBtn').innerText = "Account: " + cleanNewUser;
+                            router.exitActiveTournamentToWorkspace();
+                        });
+                    }
+                });
+            },
+
+            promptChangePassword: function() {
+                if (!sessionAdminUser) return;
+                const currentPass = globalState.admins[sessionAdminUser].password;
+                const promptVal = prompt("Enter completely fresh account validation credentials:");
+                if (!promptVal) return;
+                const cleanPass = promptVal.trim();
+                
+                if (!cleanPass || cleanPass === currentPass) return;
+
+                set(ref(database, `admins/${sessionAdminUser}/password`), cleanPass).then(() => {
+                    alert("Account security credentials successfully altered in Firebase infrastructure.");
+                });
+            },
+
+            promptDeleteAccount: function() {
+                if (!sessionAdminUser) return;
+                const verification = confirm("⚠️ IMMEDIATE DESTRUCTIVE ALERT ⚠️\n\nAre you absolutely positive you want to completely erase your master admin profile registration file?");
+                
+                if (verification) {
+                    set(ref(database, 'admins/' + sessionAdminUser), null).then(() => {
+                        alert("Administrative operational profile securely deleted.");
+                        auth.logout();
+                    });
+                }
+            }
+        };
+
+        // Self-start application frame layer on boot
+        router.toLogin();
+    </script>
+</body>
+</html>
